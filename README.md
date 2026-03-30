@@ -1,106 +1,196 @@
-# merx
+# MERX
 
-**The complete TRON infrastructure layer for AI agents.**
+**The first TRON resource exchange.**
 
 [![npm version](https://img.shields.io/npm/v/merx.svg)](https://www.npmjs.com/package/merx)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Tools](https://img.shields.io/badge/tools-52-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)
 ![Resources](https://img.shields.io/badge/resources-21-purple)
-![Transport](https://img.shields.io/badge/transport-stdio%20%2B%20SSE-orange)
 
-> Buy energy. Send USDT. Swap tokens. Simulate transactions. Monitor delegations.
-> All with automatic resource optimization across 7 providers.
-> One config line. Full TRON access.
+One platform. Every energy and bandwidth provider. Best price automatically.
 
-```json
-{ "mcpServers": { "merx": { "url": "https://merx.exchange/mcp/sse" } } }
-```
-
-**52 tools** | **30 prompts** | **21 resources** | **7 energy providers** | **2 transport modes** | **3 payment methods**
-
-[Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api-reference) | [Examples](docs/EXAMPLES.md) | [Comparison](docs/COMPARISON.md)
+[merx.exchange](https://merx.exchange) | [Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api-reference) | [MCP Server](#mcp-server)
 
 ---
 
 ## Table of contents
 
-- [Why merx exists](#why-merx-exists)
+- [What is MERX](#what-is-merx)
+- [The problem](#the-problem)
+- [Platform overview](#platform-overview)
 - [Quick start](#quick-start)
-- [What sets merx apart](#what-sets-merx-apart)
+- [What sets MERX apart](#what-sets-merx-apart)
 - [Architecture](#architecture)
-- [All capabilities](#all-capabilities)
-- [Examples](#examples)
-- [Tool reference](#tool-reference)
-- [Prompts](#prompts)
-- [Resources](#resources)
-- [Configuration](#configuration)
-- [Tested on TRON mainnet](#tested-on-tron-mainnet)
+- [API overview](#api-overview)
+- [MCP server](#mcp-server)
+- [SDKs](#sdks)
+- [Real-time data](#real-time-data)
+- [Payment methods](#payment-methods)
+- [Standing orders and monitors](#standing-orders-and-monitors)
+- [Savings calculator](#savings-calculator)
+- [Error handling](#error-handling)
+- [Security](#security)
+- [Tested on mainnet](#tested-on-mainnet)
 - [Comparison with alternatives](#comparison-with-alternatives)
 - [Documentation](#documentation)
 - [License](#license)
 
 ---
 
-## Why merx exists
+## What is MERX
+
+MERX is a TRON resource exchange that aggregates every major energy and bandwidth
+provider into a single platform. It monitors prices across all connected providers
+every 30 seconds, compares every duration tier, and routes orders to the cheapest
+available source automatically. If a provider fails or runs out of capacity, the
+next cheapest fills the order. No manual comparison. No provider lock-in.
+
+The platform handles the full resource lifecycle: price discovery, order routing,
+delegation verification, and transaction execution. All amounts are tracked in SUN
+internally (1 TRX = 1,000,000 SUN) for precision.
+
+Three ways to use MERX:
+
+- **Web platform** at [merx.exchange](https://merx.exchange) -- trade energy and
+  bandwidth through the dashboard, manage deposits and withdrawals, view order
+  history, and monitor delegations.
+
+- **REST API + SDKs** -- integrate TRON resource management into any application
+  with JavaScript, Python, or raw HTTP. 33 endpoints covering prices, orders,
+  balance, deposits, withdrawals, webhooks, and API key management.
+
+- **MCP server** -- give AI agents full TRON access through 52 tools, 30 prompts,
+  and 21 resources. Works with Claude, GPT, Cursor, and any MCP-compatible client.
+  Zero install via hosted SSE, or run locally via stdio.
+
+---
+
+## The problem
 
 Every smart contract call on TRON requires energy. Without energy, TRX tokens are
 burned as fees. A single USDT transfer burns 3-13 TRX depending on whether the
-receiving address has held USDT before (approximately $1-4 at current prices). With
-rented energy, the same transfer costs 0.17-1.43 TRX ($0.05-0.46). That is up to a
-94% reduction in transaction costs. High-volume wallets -- exchanges, payment
-processors, trading bots -- burn thousands of TRX daily without resource optimization.
+receiving address has held USDT before (approximately $1-4 at current prices).
+With rented energy, the same transfer costs 0.17-1.43 TRX. That is up to a
+**94% reduction** in transaction costs.
 
-The TRON energy market is fragmented across 7+ providers: CatFee, ITRX, PowerSun,
-Feee, TronSave, TEM, Netts. Each has different prices (22-80 SUN per unit), different
-APIs, different durations (5 minutes to 30 days). Prices change every 30 seconds. No
-single tool aggregates them all, compares prices in real time, and routes orders to
-the cheapest source. (Note: 1 TRX = 1,000,000 SUN.)
+High-volume wallets -- exchanges, payment processors, trading bots -- burn
+thousands of TRX daily without resource optimization.
 
-AI agents operating on TRON face this problem at scale. Every USDT transfer, every
-token swap, every contract call needs energy and bandwidth. Without an infrastructure
-layer, each agent must integrate with multiple providers, manage resource estimation,
-handle fallbacks, and track delegations individually. merx solves all of this with one
-MCP server -- 52 tools that cover the entire TRON resource lifecycle, from price
-discovery through transaction execution.
+The TRON energy market is fragmented. Each provider has different prices (22-80 SUN
+per unit), different APIs, different durations (5 minutes to 30 days). Prices change
+every 30 seconds. No single tool aggregates them all, compares prices in real time,
+and routes orders to the cheapest source.
 
-### Without merx
+MERX solves this by aggregating all connected providers behind one API.
 
-```
-1. Check 7 provider websites for energy prices
-2. Check bandwidth prices separately (different providers)
-3. Compare prices across 15+ duration tiers
-4. Create account on cheapest provider
-5. Fund account on that provider
-6. Call provider's unique API to order energy
-7. Wait for delegation, hope it arrives
-8. Build and sign your transaction
-9. No bandwidth optimization -- burn TRX for bandwidth
-10. If provider fails -- start over with the next one
-```
+| Without MERX | With MERX |
+|---|---|
+| Check every provider website for prices | One API call returns all prices sorted |
+| Compare across duration tiers manually | Automatic routing to cheapest source |
+| Create accounts on each provider | One MERX account covers all providers |
+| Fund each provider separately | One balance, one deposit address |
+| Handle each provider's unique API | Unified API, unified SDKs |
+| No fallback if a provider fails | Automatic failover to next cheapest |
+| No bandwidth optimization | Energy and bandwidth handled together |
+| Build and sign transactions manually | Resource-aware TX execution included |
 
-### With merx
+---
 
-```
-Agent: "Send 100 USDT to TAddr"
+## Platform overview
 
-merx: estimates energy (7,896) + bandwidth (345)
-    -> buys 65,000 energy at 22 SUN via Netts (cheapest)
-    -> skips bandwidth (free daily covers it)
-    -> waits for delegation to arrive on-chain
-    -> signs USDT transfer locally
-    -> broadcasts to TRON
-
-Done. One tool call. 0.46 TRX instead of 3.66 TRX. 87% saved.
-```
+| Component | Description |
+|---|---|
+| Web exchange | Trade energy and bandwidth at [merx.exchange](https://merx.exchange). Dashboard with real-time prices, order management, balance, and history. |
+| REST API | 33 endpoints covering prices, orders, balance, deposits, withdrawals, webhooks, and API keys. Versioned at `/api/v1/`. |
+| WebSocket | Real-time price stream at `wss://merx.exchange/ws`. Subscribe to specific providers or all. Heartbeat every 30 seconds. |
+| Webhooks | Events: `order.filled`, `order.failed`, `deposit.received`, `withdrawal.completed`. HMAC-SHA256 signed. Auto-retry on failure. |
+| JavaScript SDK | `@merx/sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
+| Python SDK | `merx-sdk` -- same 4 modules in snake_case. Zero dependencies. Python 3.11+. |
+| MCP server | 52 tools, 30 prompts, 21 resources for AI agents. Hosted SSE (zero install) or local stdio. |
+| Documentation | 36 pages at [merx.exchange/docs](https://merx.exchange/docs). API reference, guides, examples. |
+| Price widget | Embeddable widget for external sites showing live energy and bandwidth prices. |
 
 ---
 
 ## Quick start
 
-### Option 1: Hosted (zero install)
+Three paths depending on your use case.
 
-Works with Claude.ai, Cursor, and any MCP client that supports SSE transport.
+### Path 1: Web platform
+
+Go to [merx.exchange](https://merx.exchange). Sign in. Deposit TRX. Trade energy
+and bandwidth at the best available price. No code required.
+
+### Path 2: API / SDK
+
+Install the JavaScript SDK:
+
+```bash
+npm install @merx/sdk
+```
+
+Use it in your application:
+
+```typescript
+import { MerxClient } from '@merx/sdk'
+
+const merx = new MerxClient({ apiKey: 'merx_sk_your_key' })
+
+// Get current prices from all providers
+const prices = await merx.prices.list()
+console.log(prices[0])
+// { provider: "netts", price_sun: 22, available: 100000000 }
+
+// Buy energy at best price
+const order = await merx.orders.create({
+  resource_type: 'ENERGY',
+  amount: 65000,
+  duration_sec: 300,
+  target_address: 'TYourAddress...',
+})
+console.log(order.status)   // "FILLED"
+console.log(order.cost_trx) // 1.4311
+```
+
+Python:
+
+```python
+from merx import MerxClient
+
+merx = MerxClient(api_key="merx_sk_your_key")
+
+prices = merx.prices.list()
+order = merx.orders.create(
+    resource_type="ENERGY",
+    amount=65000,
+    duration_sec=300,
+    target_address="TYourAddress..."
+)
+```
+
+curl (no SDK needed):
+
+```bash
+# Public -- no auth required
+curl https://merx.exchange/api/v1/prices
+
+# Authenticated
+curl -X POST https://merx.exchange/api/v1/orders \
+  -H "Authorization: Bearer merx_sk_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource_type": "ENERGY",
+    "amount": 65000,
+    "duration_sec": 300,
+    "target_address": "TYourAddress..."
+  }'
+```
+
+### Path 3: MCP for AI agents
+
+**Hosted (zero install)** -- works with Claude.ai, Cursor, and any SSE-compatible
+MCP client:
 
 ```json
 {
@@ -112,28 +202,25 @@ Works with Claude.ai, Cursor, and any MCP client that supports SSE transport.
 }
 ```
 
-No npm install, no API key. 22 read-only tools are available immediately: prices,
-estimation, market analysis, on-chain queries, address lookups.
+22 read-only tools are available immediately: prices, estimation, market analysis,
+on-chain queries, address lookups. No API key required.
 
 To unlock trading tools, call `set_api_key` in any conversation:
 
 ```
-Agent: set_api_key("merx_sk_your_key")
+set_api_key("merx_sk_your_key")
 -> All 34 authenticated tools unlocked for this session.
 ```
 
 To unlock write tools (send TRX, swap tokens), call `set_private_key`:
 
 ```
-Agent: set_private_key("your_64_char_hex_key")
--> Address derived automatically: THT49...
--> All 52 tools available. Key never leaves your machine.
+set_private_key("your_64_char_hex_key")
+-> Address derived automatically. All 52 tools available.
+-> Key never leaves your machine.
 ```
 
-### Option 2: Local (stdio)
-
-Full power with keys set via environment variables. No need to call `set_api_key`
-or `set_private_key` each session.
+**Local (stdio)** -- full power with keys set via environment variables:
 
 ```bash
 npm install -g merx
@@ -153,54 +240,54 @@ npm install -g merx
 }
 ```
 
-All 52 tools available from first message.
+All 52 tools available from the first message.
 
-### What you get at each level
+### Access levels
 
 | Configuration | Tools | Capabilities |
 |---|---|---|
-| No keys | 22 | Prices, estimation, market analysis, explanations, on-chain queries, address lookups |
-| + `MERX_API_KEY` | 34 | + Buy energy/bandwidth, orders, balance, standing orders, monitors |
-| + `TRON_PRIVATE_KEY` | 52 | + Send TRX/USDT, swap tokens, approve contracts, execute intents, self-deposit |
-
-See [Configuration](docs/CONFIGURATION.md) for all environment variables and client configs.
+| No keys | 22 | Prices, estimation, market analysis, on-chain queries, address lookups |
+| + `MERX_API_KEY` | 34 | + Orders, balance, deposits, standing orders, monitors |
+| + `TRON_PRIVATE_KEY` | 52 | + Send TRX/USDT, swap tokens, approve contracts, execute intents |
 
 ---
 
-## What sets merx apart
+## What sets MERX apart
 
 ### Multi-provider routing
 
-7 providers aggregated: Netts, CatFee, TEM, ITRX, TronSave, Feee, PowerSun. Orders
-are routed to the cheapest source automatically. If one provider fails, the next
-cheapest fills the order. Prices cover both energy and bandwidth.
+All connected energy and bandwidth providers are aggregated. Orders are routed to
+the cheapest source automatically. If one provider fails or runs out of capacity,
+the next cheapest fills the order. Prices cover both energy and bandwidth across
+every available duration tier.
 
 ### Resource-aware transactions
 
 Every write operation (USDT transfer, token swap, contract call) automatically
-estimates energy AND bandwidth needed, buys the deficit at best market price, waits
-for delegation to arrive on-chain, then executes. The agent never burns TRX
+estimates energy AND bandwidth needed, buys the deficit at the best market price,
+waits for delegation to arrive on-chain, then executes. The caller never burns TRX
 unnecessarily. Tested on mainnet: a USDT transfer with auto-resources saves up to
 94% compared to burning.
 
 ### Exact energy simulation
 
-Before buying energy for swaps and contract calls, merx simulates the exact
+Before buying energy for swaps and contract calls, MERX simulates the exact
 transaction via `triggerConstantContract` with real parameters. No hardcoded
 estimates -- the precise energy amount is purchased. For a SunSwap swap, simulation
 returned 223,354 energy; the on-chain transaction used exactly 223,354.
 
 ### Intent execution
 
-The agent describes a multi-step plan (transfer + swap + another transfer). merx
-simulates all steps, estimates total resource cost, and executes sequentially.
-Stateful simulation: energy consumed by step 1 is not available for step 2.
+Describe a multi-step plan (transfer + swap + another transfer). MERX simulates all
+steps, estimates total resource cost, and executes sequentially. Stateful simulation:
+energy consumed by step 1 is not available for step 2. Accurate total cost estimates
+for complex workflows.
 
 ### Standing orders
 
 Server-side 24/7 automation stored in PostgreSQL. Example: "Buy 65,000 energy when
 price drops below 20 SUN." Trigger types: `price_below`, `price_above`, `schedule`
-(cron), `balance_below`. Persists across restarts. Works when the agent is offline.
+(cron), `balance_below`. Persists across restarts. Works when the client is offline.
 
 ### Delegation monitors
 
@@ -210,142 +297,149 @@ Auto-renew with configurable max price. Monitor types: `delegation_expiry`,
 
 ### x402 pay-per-use
 
-No account needed. No pre-deposit. The agent creates an invoice, pays with TRX from
-its own wallet, and receives energy delegation. Complete flow in one tool call.
-Tested on mainnet: 1.43 TRX payment resulted in 65,050 energy delegated.
+No account needed. No pre-deposit. Create an invoice, pay with TRX from any wallet,
+and receive energy delegation. Complete flow in one API call. Tested on mainnet:
+1.43 TRX payment resulted in 65,050 energy delegated.
 
 ### Full MCP protocol
 
 The only TRON MCP server using all three MCP primitives: tools (52), prompts (30),
-and resources (21 -- 14 static + 7 templates). No other blockchain MCP server has
-this coverage.
+and resources (21 -- 14 static + 7 templates). Two transport modes: hosted SSE
+(zero install) and local stdio (full key management).
 
 ---
 
 ## Architecture
 
+### Platform overview
+
 ```mermaid
 graph TB
-    Agent[AI Agent<br>Claude / GPT / Cursor]
-    MCP[merx MCP Server<br>52 tools / 30 prompts / 21 resources]
-    API[Merx API<br>merx.exchange/api/v1]
-    TG[TronGrid<br>TRON RPC]
-    Providers[7 Energy Providers<br>CatFee, ITRX, PowerSun,<br>Feee, TronSave, TEM, Netts]
+    User[User / Application / AI Agent]
+    Platform[MERX Platform<br>merx.exchange]
+    PM[Price Monitor<br>polls every 30s]
+    OE[Order Executor<br>routes to cheapest]
+    DV[Delegation Verifier<br>confirms on-chain]
+    TR[Treasury<br>balance management]
+    RPC[TronGrid / GetBlock<br>TRON RPC]
+    Providers[Energy Providers<br>all connected]
     TRON[TRON Blockchain]
 
-    Agent -->|MCP Protocol<br>stdio or SSE| MCP
-    MCP -->|HTTPS| API
-    API -->|RPC calls| TG
-    API -->|Order routing<br>cheapest first| Providers
-    TG --> TRON
+    User -->|Web / API / SDK / MCP| Platform
+    Platform --> PM
+    Platform --> OE
+    Platform --> DV
+    Platform --> TR
+    PM -->|Price polling| Providers
+    OE -->|Order routing<br>cheapest first| Providers
+    DV -->|Verify delegations| RPC
+    RPC --> TRON
     Providers -->|Delegate energy<br>+ bandwidth| TRON
 
-    style Agent fill:#1a1a2e,stroke:#B8963E,color:#F5F0E8
-    style MCP fill:#0C0B09,stroke:#B8963E,color:#F5F0E8
-    style API fill:#141310,stroke:#B8963E,color:#F5F0E8
+    style User fill:#1a1a2e,stroke:#B8963E,color:#F5F0E8
+    style Platform fill:#0C0B09,stroke:#B8963E,color:#F5F0E8
+    style TRON fill:#141310,stroke:#B8963E,color:#F5F0E8
 ```
 
 <details>
 <summary>ASCII diagram (if Mermaid does not render)</summary>
 
 ```
-AI Agent (Claude / GPT / Cursor)
+User / Application / AI Agent
     |
-    | MCP Protocol (stdio or SSE)
+    | Web / REST API / SDK / MCP
     v
-merx MCP Server (52 tools)
-    |
-    | HTTPS
-    v
-Merx API (merx.exchange/api/v1)
-    |
-    +---> TronGrid (TRON RPC)
-    |         |
-    |         v
-    |     TRON Blockchain
-    |
-    +---> 7 Energy Providers
-              |
-              v
-          TRON Blockchain (delegate energy + bandwidth)
++----------------------------------+
+|         MERX Platform            |
+|         merx.exchange            |
+|                                  |
+|  +------------+ +-------------+  |
+|  |   Price    | |   Order     |  |
+|  |  Monitor   | |  Executor   |  |
+|  | (every 30s)| | (cheapest)  |  |
+|  +------------+ +-------------+  |
+|  +------------+ +-------------+  |
+|  | Delegation | |  Treasury   |  |
+|  |  Verifier  | |  Manager    |  |
+|  +------------+ +-------------+  |
++----------------------------------+
+    |                    |
+    v                    v
+TronGrid / GetBlock   Energy Providers
+(TRON RPC)            (all connected)
+    |                    |
+    v                    v
++----------------------------------+
+|        TRON Blockchain           |
++----------------------------------+
 ```
 
 </details>
 
-**Key architecture principle:** All traffic goes through Merx API. The user never
-needs TronGrid API keys. Merx manages all RPC infrastructure, caching, and failover
-server-side. The only operation that stays on the client: transaction signing with
-`TRON_PRIVATE_KEY`. Private keys never leave the MCP process.
+**Key architecture principle:** All traffic goes through the MERX platform. Users
+never need TronGrid API keys. MERX manages all RPC infrastructure, caching, and
+failover server-side. The only operation that stays on the client: transaction
+signing with a private key. Private keys never leave the client process.
 
 ### Resource-aware transaction flow
 
 This sequence diagram shows a real USDT transfer with auto-resource optimization.
-Numbers are from production testing on 2026-03-30.
+Numbers are from production testing.
 
 ```mermaid
 sequenceDiagram
-    participant A as Agent
-    participant M as merx
-    participant API as Merx API
+    participant C as Client
+    participant M as MERX
+    participant P as Providers
     participant T as TRON
 
-    A->>M: transfer_trc20(USDT, 100, TAddr)
-    M->>API: POST /estimate (trc20_transfer)
-    API-->>M: energy: 7,896 / bandwidth: 345
-    M->>API: GET /chain/resources/TSender
-    API-->>M: energy: 0 / bandwidth: 0 / free BW: 600
-    Note over M: Energy deficit: 7,896 (round up to 65,000 min)<br>Bandwidth: 345 < 1,500 min order, skip (burn ~0.3 TRX)
-    M->>API: POST /orders (ENERGY, 65000, 300s)
-    API-->>M: FILLED via Netts at 22 SUN (1.43 TRX)
-    Note over M: waitForDelegation() -- poll every 2s<br>until energy appears on sender address
-    M->>API: GET /chain/resources/TSender
-    API-->>M: energy: 65,050 available
-    Note over M: Sign USDT transfer with TRON_PRIVATE_KEY locally
-    M->>API: POST /chain/broadcast (signed TX)
-    API->>T: Broadcast
-    T-->>API: TX confirmed
-    M-->>A: USDT sent. TX: f4620c52...<br>Energy cost: 1.43 TRX<br>Burn alternative: 3.66 TRX<br>Savings: 87.6%
+    C->>M: POST /orders or transfer_trc20(USDT, 100, TAddr)
+    M->>M: POST /estimate (trc20_transfer)
+    Note over M: energy: 7,896 / bandwidth: 345
+    M->>M: GET /chain/resources/TSender
+    Note over M: energy: 0 / bandwidth: 0 / free BW: 600
+    Note over M: Energy deficit: 7,896 (round up to 65,000 min)<br>Bandwidth: 345 < 1,500 min order, skip
+    M->>P: Route order: ENERGY, 65,000, 300s
+    P-->>M: FILLED at 22 SUN (1.43 TRX)
+    Note over M: Poll every 2s until delegation arrives
+    M->>T: Verify delegation on sender address
+    T-->>M: energy: 65,050 available
+    Note over M: Sign TX (client-side if MCP, server-side if API)
+    M->>T: Broadcast signed TX
+    T-->>M: TX confirmed
+    M-->>C: USDT sent. Cost: 1.43 TRX.<br>Burn alternative: 3.66 TRX. Savings: 87.6%
 ```
 
 <details>
 <summary>ASCII diagram (if Mermaid does not render)</summary>
 
 ```
-Agent                   merx                    Merx API                TRON
+Client                  MERX                    Providers               TRON
   |                       |                       |                      |
-  | transfer_trc20(...)   |                       |                      |
+  | order / transfer      |                       |                      |
   |---------------------->|                       |                      |
-  |                       | POST /estimate        |                      |
+  |                       | estimate energy+BW    |                      |
+  |                       | energy: 7,896         |                      |
+  |                       | bandwidth: 345        |                      |
+  |                       |                       |                      |
+  |                       | check sender resources|                      |
+  |                       | energy: 0, BW: 0      |                      |
+  |                       |                       |                      |
+  |                       | [deficit: 7,896 -> round up to 65,000]      |
+  |                       | [BW: 345 < 1,500 min -> skip, burn ~0.3 TRX]|
+  |                       |                       |                      |
+  |                       | route to cheapest     |                      |
   |                       |---------------------->|                      |
-  |                       |   energy: 7,896       |                      |
-  |                       |   bandwidth: 345      |                      |
+  |                       |   FILLED 22 SUN       |                      |
+  |                       |   1.43 TRX            |                      |
   |                       |<----------------------|                      |
   |                       |                       |                      |
-  |                       | GET /chain/resources  |                      |
-  |                       |---------------------->|                      |
-  |                       |   energy: 0, BW: 0    |                      |
-  |                       |<----------------------|                      |
+  |                       | [poll until delegation arrives]              |
   |                       |                       |                      |
-  |                       | [Energy deficit: 7,896 -> round up to 65,000]|
-  |                       | [Bandwidth: 345 < 1,500 min -> skip]        |
+  |                       | verify delegation     |--------------------->|
+  |                       |   energy: 65,050      |<---------------------|
   |                       |                       |                      |
-  |                       | POST /orders          |                      |
-  |                       | (ENERGY, 65000, 300s) |                      |
-  |                       |---------------------->|                      |
-  |                       |   FILLED via Netts    |                      |
-  |                       |   22 SUN = 1.43 TRX   |                      |
-  |                       |<----------------------|                      |
-  |                       |                       |                      |
-  |                       | [Poll every 2s until delegation arrives]     |
-  |                       |                       |                      |
-  |                       | GET /chain/resources  |                      |
-  |                       |---------------------->|                      |
-  |                       |   energy: 65,050      |                      |
-  |                       |<----------------------|                      |
-  |                       |                       |                      |
-  |                       | [Sign TX locally with TRON_PRIVATE_KEY]      |
-  |                       |                       |                      |
-  |                       | POST /chain/broadcast |                      |
+  |                       | [sign + broadcast]    |                      |
   |                       |---------------------->|--------------------->|
   |                       |                       |   TX confirmed       |
   |                       |<----------------------|<---------------------|
@@ -361,215 +455,191 @@ Agent                   merx                    Merx API                TRON
 
 ### Resource purchase rules
 
-These rules are derived from production testing:
-
 | Rule | Details |
 |---|---|
 | Energy deficit > 0 | Round up to minimum 65,000 units. Cheaper to buy minimum than to burn even small deficits. |
 | Bandwidth deficit < 1,500 | Skip purchase, let network burn ~0.3 TRX. Cheaper than minimum bandwidth order. |
 | After energy purchase | Poll `check_address_resources` every 2 seconds until delegation arrives on-chain. Never broadcast TX before delegation is confirmed. |
-| DEX swaps | Simulate exact energy via `triggerConstantContract` with real swap parameters. Do not use hardcoded estimates. |
+| DEX swaps | Simulate exact energy via `triggerConstantContract` with real swap parameters. No hardcoded estimates. |
 
 ---
 
-## All capabilities
+## API overview
 
-| Category | Tools | Auth | Description |
+Base URL: `https://merx.exchange/api/v1`
+
+All endpoints are versioned. Errors follow a standard format:
+`{ "error": { "code": "...", "message": "...", "details": { ... } } }`.
+Idempotency-Key header supported on `POST /orders` and `POST /withdraw`.
+
+### Public endpoints (no authentication)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/prices` | Current energy and bandwidth prices from all providers |
+| GET | `/prices/best` | Cheapest provider for given resource and amount |
+| GET | `/prices/history` | Historical price snapshots by provider and period |
+| GET | `/prices/stats` | Price statistics: min, max, average, percentiles |
+| GET | `/prices/analysis` | Market analysis with trends and recommendations |
+| GET | `/orders/preview` | Preview order cost without creating it |
+| POST | `/estimate` | Estimate energy and bandwidth for any transaction type |
+| GET | `/chain/account/:address` | On-chain account info |
+| GET | `/chain/resources/:address` | Energy, bandwidth, and free BW for any address |
+| GET | `/chain/transaction/:txid` | Transaction details by ID |
+| GET | `/chain/block/:number` | Block info by number or latest |
+| GET | `/chain/parameters` | TRON network parameters |
+
+### Authenticated endpoints (API key required)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/orders` | Create order -- routed to cheapest provider |
+| GET | `/orders` | List orders with optional status filter |
+| GET | `/orders/:id` | Order details with fills, TX hashes, verification |
+| GET | `/balance` | MERX account balance (TRX, USDT, locked) |
+| GET | `/deposit/info` | Deposit address and memo |
+| POST | `/withdraw` | Withdraw TRX to external address |
+| GET | `/history` | Account transaction history |
+| GET | `/history/summary` | History summary with totals |
+| POST | `/keys` | Create new API key |
+| GET | `/keys` | List API keys |
+| DELETE | `/keys/:id` | Revoke API key |
+| POST | `/webhooks` | Register webhook endpoint |
+| GET | `/webhooks` | List registered webhooks |
+| DELETE | `/webhooks/:id` | Remove webhook |
+| POST | `/ensure` | Ensure minimum resources on an address |
+| POST | `/standing-orders` | Create server-side standing order |
+| GET | `/standing-orders` | List standing orders |
+| POST | `/monitors` | Create delegation or balance monitor |
+| GET | `/monitors` | List monitors |
+
+### x402 endpoints (zero registration)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/x402/invoice` | Create payment invoice |
+| POST | `/x402/verify` | Verify invoice payment |
+
+Full API reference: [merx.exchange/docs/api-reference](https://merx.exchange/docs/api-reference)
+
+---
+
+## MCP server
+
+MERX provides a full MCP (Model Context Protocol) server for AI agents. 52 tools
+across 15 categories, 30 pre-built prompts, and 21 live data resources.
+
+### Tool categories
+
+| Category | Count | Auth | Description |
 |---|---|---|---|
-| Price Intelligence | 5 | -- | Real-time prices from 7 providers, market analysis, trends, history |
-| Resource Estimation | 2 | -- | Estimate energy + bandwidth for any transaction type, compare rent vs burn |
+| Price Intelligence | 5 | -- | Real-time prices from all providers, market analysis, trends, history |
+| Resource Estimation | 2 | -- | Estimate energy + bandwidth for any transaction type |
 | Resource Trading | 4 | API key | Buy energy/bandwidth at best price, ensure resources on any address |
 | Account Management | 3 | API key | Balance, deposit info, transaction history |
 | Agent Convenience | 4 | -- | Explain concepts, suggest durations, calculate savings, list providers |
 | On-chain Queries | 5 | -- | Account info, TRX/TRC20 balances, transaction lookup, blocks |
 | Token Operations | 4 | Private key | Send TRX, transfer TRC20, approve tokens -- all resource-aware |
 | Smart Contracts | 3 | Mixed | Read contract state, estimate call cost, execute with auto-resources |
-| Network Utilities | 5 | -- | Chain parameters, address tools, TRX price, on-chain transaction history |
+| Network Utilities | 5 | -- | Chain parameters, address tools, TRX price, on-chain history |
 | DEX Swaps | 3 | Private key | SunSwap V2 quotes, execution with exact energy simulation |
 | Onboarding | 2 | -- | Create account + login, no browser needed |
-| Payments | 4 | Mixed | Self-deposit from wallet, auto-deposit config, x402 pay-per-use |
-| Intent Execution | 2 | Mixed | Multi-step plans: simulate or execute complex operation sequences |
-| Standing Orders | 4 | API key | Server-side 24/7 automation: price triggers, schedule, monitors |
+| Payments | 4 | Mixed | Self-deposit, auto-deposit config, x402 pay-per-use |
+| Intent Execution | 2 | Mixed | Multi-step plans: simulate or execute complex sequences |
+| Standing Orders | 4 | API key | Server-side 24/7 automation: price triggers, cron, monitors |
 | Session Management | 2 | -- | Set API key and private key for current session |
 | **Total** | **52** | | |
 
-See [complete tool reference](docs/TOOLS.md) for input schemas and examples.
+### Prompts (30)
 
----
+Pre-built conversation templates available in Claude Desktop prompt picker and via
+`prompts/get` in any MCP client.
 
-## Examples
+| Group | Prompts | Examples |
+|---|---|---|
+| Market (5) | buy-energy, buy-bandwidth, ensure-resources, market-analysis, compare-providers | "Buy energy at best market price" |
+| Transactions (5) | send-usdt, send-trx, send-token, multi-transfer, explain-transaction | "Send USDT with auto resource optimization" |
+| Wallet (4) | check-wallet, audit-spending, monitor-delegations, optimize-wallet | "Full wallet overview with balances and delegations" |
+| DEX (3) | swap-tokens, check-token, price-check | "Swap tokens via SunSwap" |
+| Planning (3) | estimate-costs, budget-plan, stake-vs-rent | "Plan energy budget for a period" |
+| Developer (2) | integrate-merx, setup-mcp | "How to integrate MERX API" |
+| Onboarding (2) | onboard, fund-account | "Create account and get started" |
+| Payments (2) | setup-auto-funding, buy-without-account | "x402 zero-registration purchase" |
+| Simulation (2) | simulate-plan, execute-plan | "Simulate a multi-step plan" |
+| Monitoring (2) | setup-standing-order, auto-renew-delegations | "Set up auto-renewal for delegations" |
 
-All examples below use real data from production testing on TRON mainnet (2026-03-30).
-Prices, TX hashes, and savings percentages are from actual on-chain transactions.
+### Resources (21)
 
-### Example 1: Check energy prices
+14 static resources + 7 URI templates. Attach to conversations as context or
+subscribe for real-time updates.
+
+| Resource | URI | Updates |
+|---|---|---|
+| Energy prices | `merx://prices/energy` | Every 30s |
+| Bandwidth prices | `merx://prices/bandwidth` | Every 30s |
+| Best price | `merx://prices/best` | Every 30s |
+| Market analysis | `merx://market/analysis` | Every 5m |
+| Provider list | `merx://market/providers` | Every 30s |
+| Provider status | `merx://market/providers/status` | Every 30s |
+| Account balance | `merx://account/balance` | On change |
+| Recent orders | `merx://account/orders/recent` | On change |
+| Account stats | `merx://account/stats` | Every 5m |
+| Auto-deposit config | `merx://account/auto-deposit` | On change |
+| Network parameters | `merx://network/parameters` | Every 1h |
+| TRX price | `merx://network/trx-price` | Every 1m |
+| Token reference | `merx://reference/tokens` | Static |
+| Standing orders | `merx://standing-orders/active` | On change |
+
+**URI Templates:**
+
+| Template | Description |
+|---|---|
+| `merx://address/{address}/overview` | Full address state: TRX, tokens, energy, bandwidth |
+| `merx://address/{address}/resources` | Energy + bandwidth with free BW tracking |
+| `merx://address/{address}/transactions` | Recent transactions with type and amounts |
+| `merx://address/{address}/delegations` | Active delegations with expiry times |
+| `merx://token/{token}/info` | Token metadata + price + transfer energy cost |
+| `merx://order/{order_id}/status` | Order details with fills and cost breakdown |
+| `merx://standing-order/{id}/status` | Standing order trigger state and executions |
+
+### Example conversations
+
+**Check prices and buy energy:**
 
 ```
-User: What's the cheapest energy right now?
-
-Agent calls: get_prices(resource: "ENERGY")
-
-merx returns:
-  Provider | Type  | Best Price | Available     | Durations
-  ---------|-------|------------|---------------|---------------------------
-  netts    | Fixed | 22 SUN     | 100,000,000   | 5m, 1h
-  catfee   | Fixed | 27 SUN     | 2,085,535,282 | 1h
-  tem      | P2P   | 35 SUN     | 177,991,103   | 5m, 1h, 3h, 12h, 1d-30d
-  itrx     | Fixed | 42 SUN     | 10,161,061    | 1h, 1d, 3d, 30d
-  tronsave | P2P   | 50 SUN     | 40,136,084    | flexible
-  powersun | Fixed | 80 SUN     | 29,780,366    | 2m-30d
-
-Agent: The cheapest energy is 22 SUN/unit from Netts for 5-minute
-delegation. For 65,000 energy (one USDT transfer), that's 1.43 TRX.
-CatFee is next at 27 SUN (1-hour). Want me to buy some?
+User: What is the cheapest energy right now?
+Agent: [calls get_prices] Cheapest energy is 22 SUN from Netts (5-minute
+       delegation). For 65,000 energy, that is 1.43 TRX.
+User: Buy it for TLyqz...
+Agent: [calls create_order] Done. 65,050 energy delegated via Netts.
+       Cost: 1.43 TRX. TX: 27ab0019... (verified on-chain).
 ```
 
-### Example 2: Buy energy and verify
+**Resource-aware USDT transfer:**
 
 ```
-User: Buy 65,000 energy for my address TLyqz...
-
-Agent calls: set_api_key("merx_sk_...")
-Agent calls: create_order(amount: 65000, duration_sec: 300,
-  resource_type: "ENERGY", target_address: "TLyqz...")
-
-merx returns:
-  Order: ed7efe5f-a795-4dba-a2e6-8879967fc709
-  Status: PENDING
-  Created: 2026-03-30T06:44:44.839Z
-
-Agent calls: get_order("ed7efe5f-a795-4dba-a2e6-8879967fc709")
-
-merx returns:
-  Order: ed7efe5f
-  Status: FILLED
-  Resource: ENERGY | Amount: 65000
-  Duration: 5m | Cost: 1.4311 TRX
-  Fills (1):
-    netts: 65,050 @ 22 SUN = 1.4311 TRX [verified]
-    TX: 27ab0019...
-
-Agent: Done. 65,050 energy delegated to your address via Netts
-at 22 SUN. Cost: 1.43 TRX. The delegation lasts 5 minutes.
-TX hash: 27ab0019... (verified on-chain).
+User: Send 100 USDT to TAddr.
+Agent: [calls transfer_trc20] MERX estimated 7,896 energy needed,
+       bought 65,000 at 22 SUN, waited for delegation, signed and
+       broadcast. USDT sent. Cost: 1.43 TRX instead of 3.66 TRX.
+       Savings: 87.6%.
 ```
 
-### Example 3: Market analysis
+**Market analysis:**
 
 ```
 User: Is now a good time to buy energy?
-
-Agent calls: analyze_prices(resource: "ENERGY")
-
-merx returns:
-  --- ENERGY ---
-  Current best: netts at 22 SUN (5m)
-  24h average:  58 SUN
-  7d average:   62 SUN
-  Percentile:   1%
-  Trend:        falling
-  Recommendation: good_time_to_buy
-  Current best price (22 SUN) is 64% below the 7-day average.
-
-Agent: Great time to buy. Energy is at 22 SUN -- the 1st percentile
-of the last 7 days. That's 64% below the weekly average of 62 SUN.
-The trend is falling. If you have upcoming transactions, buying now
-locks in this rate.
+Agent: [calls analyze_prices] Energy is at 22 SUN -- the 1st percentile
+       of the last 7 days. 64% below the weekly average of 62 SUN.
+       Trend: falling. Recommendation: good time to buy.
 ```
 
-### Example 4: Simulate a multi-step plan
+### Full tool reference
 
-```
-User: I want to send 500 USDT to one address and 300 USDT to another.
-How much will it cost?
+All 52 tools with auth requirements. For input schemas and output examples, see
+[docs/TOOLS.md](docs/TOOLS.md).
 
-Agent calls: simulate(steps: [
-  { action: "transfer_trc20", params: { token: "USDT", to: "TAddr1", amount: "500" } },
-  { action: "transfer_trc20", params: { token: "USDT", to: "TAddr2", amount: "300" } }
-])
-
-merx returns:
-  Step 1: transfer_trc20 - 500 USDT -> TAddr1
-    Energy: ~65,000 | Bandwidth: ~345
-  Step 2: transfer_trc20 - 300 USDT -> TAddr2
-    Energy: ~65,000 | Bandwidth: ~345
-
-  Total energy: 130,000 | Total bandwidth: 690
-  Rental cost: ~4.94 TRX
-  Burn alternative: ~55.29 TRX
-  Savings: 91%
-
-Agent: Both transfers would need 130,000 energy total. Renting costs
-about 4.94 TRX. Without energy, you'd burn 55.29 TRX. That's 91%
-savings. Want me to execute both transfers?
-```
-
-### Example 5: SunSwap swap with auto-resources
-
-```
-User: Swap 0.1 TRX to USDT.
-
-Agent calls: set_private_key("64_char_hex...")
-Agent calls: execute_swap(from_token: "TRX", to_token: "USDT",
-  amount: "0.1", slippage: 2)
-
-merx returns:
-  Swap Broadcast: 0.1 TRX -> USDT
-  TX ID: 61424b1e89a047fe...
-  Expected output: 0.032094 USDT
-  Status: BROADCAST
-  Energy purchased: 223,354
-
-Agent calls: get_transaction("61424b1e89a047fe...")
-
-merx returns:
-  Status: SUCCESS
-  Energy: 223,354
-  Timestamp: 2026-03-30T09:49:51Z
-
-Agent: Swap completed. 0.1 TRX swapped to 0.032094 USDT via SunSwap V2.
-merx simulated the exact energy needed (223,354 units), bought it
-at 22 SUN, waited for delegation, then executed the swap.
-TX: 61424b1e... confirmed on-chain.
-```
-
-### Example 6: x402 zero-registration order
-
-```
-User: I need energy but I don't have a Merx account.
-Just pay from my wallet.
-
-Agent calls: set_private_key("64_char_hex...")
-Agent calls: create_paid_order(amount: 65000, duration_sec: 300,
-  resource_type: "ENERGY", target_address: "THT49...")
-
-merx returns:
-  x402 Order Created
-  Invoice: inv_f41ffc2f...
-  Payment TX: 53236a5a...
-  Cost: 1.4300 TRX
-  Order ID: cf22304f-5c10-408b...
-  Status: PENDING
-  Target: THT49FNBPAg1DYisqCtjmxHTQVLmgKYBg8
-  Resource: 65000 ENERGY for 300s
-
-Agent calls: check_address_resources("THT49...")
-
-merx returns:
-  Energy: 65,050 / 65,050 (used: 0)
-
-Agent: Done. No account needed. merx created an invoice for 1.43 TRX,
-paid it from your wallet (TX: 53236a5a...), and delegated 65,050
-energy to your address. The whole process took one tool call.
-```
-
----
-
-## Tool reference
-
-All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOLS.md](docs/TOOLS.md).
-
-### Price Intelligence
+**Price Intelligence**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -579,14 +649,14 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 4 | `get_price_history` | Historical price snapshots by provider, resource, and period | -- |
 | 5 | `compare_providers` | Side-by-side provider comparison with all duration tiers | -- |
 
-### Resource Estimation
+**Resource Estimation**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
 | 6 | `estimate_transaction_cost` | Estimate energy + bandwidth for TRX/TRC20/custom operations | -- |
 | 7 | `check_address_resources` | Energy, bandwidth, free BW, and TRX balance for any address | -- |
 
-### Resource Trading
+**Resource Trading**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -595,24 +665,24 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 10 | `list_orders` | List orders with optional status filter | API key |
 | 11 | `ensure_resources` | Declarative: ensure minimum energy/bandwidth on an address | API key |
 
-### Account Management
+**Account Management**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 12 | `get_balance` | Merx account balance (TRX, USDT, locked) | API key |
-| 13 | `get_deposit_info` | Merx deposit address and memo | API key |
-| 14 | `get_transaction_history` | Merx account order history (7D/30D/90D) | API key |
+| 12 | `get_balance` | MERX account balance (TRX, USDT, locked) | API key |
+| 13 | `get_deposit_info` | MERX deposit address and memo | API key |
+| 14 | `get_transaction_history` | MERX account order history (7D/30D/90D) | API key |
 
-### Agent Convenience
+**Agent Convenience**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 15 | `explain_concept` | Explain TRON concepts: energy, bandwidth, staking, delegation, burn_vs_rent, merx_routing, provider_types, sun_units | -- |
+| 15 | `explain_concept` | Explain TRON concepts: energy, bandwidth, staking, delegation, sun_units | -- |
 | 16 | `suggest_duration` | Recommend rental duration based on use case and TX count | -- |
 | 17 | `calculate_savings` | Calculate savings from renting vs burning for N transactions | -- |
 | 18 | `list_providers` | All providers with types, durations, and availability | -- |
 
-### On-chain Queries
+**On-chain Queries**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -622,7 +692,7 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 22 | `get_transaction` | Look up transaction by ID with status, energy, bandwidth used | -- |
 | 23 | `get_block` | Block info by number (or latest) | -- |
 
-### Token Operations
+**Token Operations**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -631,7 +701,7 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 26 | `approve_trc20` | Approve TRC-20 spending allowance with auto energy | Private key |
 | 27 | `get_token_info` | Token metadata: name, symbol, decimals, total supply | -- |
 
-### Smart Contracts
+**Smart Contracts**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -639,17 +709,17 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 29 | `estimate_contract_call` | Estimate energy + bandwidth for a contract call | -- |
 | 30 | `call_contract` | Execute state-changing contract function with auto resources | Private key |
 
-### Network Utilities
+**Network Utilities**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 31 | `get_chain_parameters` | TRON network parameters with Merx price comparison | -- |
+| 31 | `get_chain_parameters` | TRON network parameters with MERX price comparison | -- |
 | 32 | `convert_address` | Convert between base58 (T...) and hex (41...) formats | -- |
 | 33 | `get_trx_price` | Current TRX price from CoinGecko | -- |
 | 34 | `validate_address` | Validate TRON address format and check on-chain status | -- |
 | 35 | `search_transaction_history` | On-chain transaction history for any address | -- |
 
-### DEX Swaps
+**DEX Swaps**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -657,30 +727,30 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 37 | `execute_swap` | Execute SunSwap swap with exact energy simulation | Private key |
 | 38 | `get_token_price` | Token price via SunSwap pools + CoinGecko USD rate | -- |
 
-### Onboarding
+**Onboarding**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 39 | `create_account` | Create Merx account and get API key | -- |
-| 40 | `login` | Log in to existing Merx account | -- |
+| 39 | `create_account` | Create MERX account and get API key | -- |
+| 40 | `login` | Log in to existing MERX account | -- |
 
-### Payments
+**Payments**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 41 | `deposit_trx` | Deposit TRX to Merx from wallet (signs TX with memo) | API key + Private key |
+| 41 | `deposit_trx` | Deposit TRX to MERX from wallet (signs TX with memo) | API key + Private key |
 | 42 | `enable_auto_deposit` | Configure auto-deposit when balance drops below threshold | API key |
 | 43 | `pay_invoice` | Pay an existing x402 invoice | Private key |
 | 44 | `create_paid_order` | x402 zero-registration order: invoice, pay, verify, order | Private key |
 
-### Intent Execution
+**Intent Execution**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
 | 45 | `execute_intent` | Execute multi-step plan with resource optimization | API key |
 | 46 | `simulate` | Simulate multi-step plan without executing | -- |
 
-### Standing Orders and Monitors
+**Standing Orders and Monitors**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
@@ -689,433 +759,188 @@ All 52 tools across 15 categories. For full input/output schemas, see [docs/TOOL
 | 49 | `create_monitor` | Create persistent monitor (delegation, balance, price) | API key |
 | 50 | `list_monitors` | List monitors with status filter | API key |
 
-### Session Management
+**Session Management**
 
 | # | Tool | Description | Auth |
 |---|---|---|---|
-| 51 | `set_api_key` | Set Merx API key for this session | -- |
+| 51 | `set_api_key` | Set MERX API key for this session | -- |
 | 52 | `set_private_key` | Set TRON private key for this session (address auto-derived) | -- |
 
 ---
 
-## Prompts
+## SDKs
 
-30 pre-built conversation templates. Available in Claude Desktop prompt picker and
-via `prompts/get` in any MCP client.
-
-### Market
-
-| # | Prompt | Description |
-|---|---|---|
-| 1 | `buy-energy` | Buy energy at best market price |
-| 2 | `buy-bandwidth` | Buy bandwidth at best market price |
-| 3 | `ensure-resources` | Ensure minimum resources on an address |
-| 4 | `market-analysis` | Full market analysis with trends |
-| 5 | `compare-providers` | Side-by-side provider comparison |
-
-### Transactions
-
-| # | Prompt | Description |
-|---|---|---|
-| 6 | `send-usdt` | Send USDT with auto resource optimization |
-| 7 | `send-trx` | Send TRX with bandwidth handling |
-| 8 | `send-token` | Send any TRC-20 token |
-| 9 | `multi-transfer` | Batch transfers to multiple addresses |
-| 10 | `explain-transaction` | Explain a transaction by TX hash |
-
-### Wallet
-
-| # | Prompt | Description |
-|---|---|---|
-| 11 | `check-wallet` | Full wallet overview (balances, resources, delegations) |
-| 12 | `audit-spending` | Analyze energy and bandwidth spending |
-| 13 | `monitor-delegations` | Check and monitor active delegations |
-| 14 | `optimize-wallet` | Suggest optimizations for a wallet |
-
-### DEX
-
-| # | Prompt | Description |
-|---|---|---|
-| 15 | `swap-tokens` | Swap tokens via SunSwap |
-| 16 | `check-token` | Token info and price |
-| 17 | `price-check` | Quick price check for any token |
-
-### Planning
-
-| # | Prompt | Description |
-|---|---|---|
-| 18 | `estimate-costs` | Estimate costs for operations |
-| 19 | `budget-plan` | Plan energy budget for a period |
-| 20 | `stake-vs-rent` | Compare staking vs renting economics |
-
-### Developer
-
-| # | Prompt | Description |
-|---|---|---|
-| 21 | `integrate-merx` | How to integrate Merx API |
-| 22 | `setup-mcp` | How to set up the MCP server |
-
-### Onboarding
-
-| # | Prompt | Description |
-|---|---|---|
-| 23 | `onboard` | Create account and get started |
-| 24 | `fund-account` | Fund Merx account from wallet |
-
-### Payments
-
-| # | Prompt | Description |
-|---|---|---|
-| 25 | `setup-auto-funding` | Configure auto-deposit |
-| 26 | `buy-without-account` | x402 zero-registration purchase |
-
-### Simulation
-
-| # | Prompt | Description |
-|---|---|---|
-| 27 | `simulate-plan` | Simulate a multi-step plan |
-| 28 | `execute-plan` | Execute a simulated plan |
-
-### Monitoring
-
-| # | Prompt | Description |
-|---|---|---|
-| 29 | `setup-standing-order` | Create a standing order |
-| 30 | `auto-renew-delegations` | Set up auto-renewal for delegations |
-
-See [docs/PROMPTS.md](docs/PROMPTS.md) for full prompt templates.
-
----
-
-## Resources
-
-21 live data endpoints. Attach to conversations as context or subscribe for
-real-time updates.
-
-### Static Resources (14)
-
-| # | URI | Description | Updates |
-|---|---|---|---|
-| 1 | `merx://prices/energy` | Energy prices from all providers | Every 30s |
-| 2 | `merx://prices/bandwidth` | Bandwidth prices from all providers | Every 30s |
-| 3 | `merx://prices/best` | Current best price for energy and bandwidth | Every 30s |
-| 4 | `merx://market/analysis` | Market analysis with trends and recommendations | Every 5m |
-| 5 | `merx://market/providers` | All providers with types, durations, availability | Every 30s |
-| 6 | `merx://market/providers/status` | Provider online/offline status | Every 30s |
-| 7 | `merx://account/balance` | Merx account balance | On change |
-| 8 | `merx://account/orders/recent` | Recent orders | On change |
-| 9 | `merx://account/stats` | Account statistics | Every 5m |
-| 10 | `merx://account/auto-deposit` | Auto-deposit configuration | On change |
-| 11 | `merx://network/parameters` | TRON network parameters | Every 1h |
-| 12 | `merx://network/trx-price` | Current TRX/USD price | Every 1m |
-| 13 | `merx://reference/tokens` | Known token addresses and metadata | Static |
-| 14 | `merx://standing-orders/active` | Active standing orders | On change |
-
-### Resource Templates (7)
-
-| # | URI Template | Description |
-|---|---|---|
-| 1 | `merx://address/{address}/overview` | Full address state: TRX, tokens, energy, bandwidth |
-| 2 | `merx://address/{address}/resources` | Energy + bandwidth with free BW tracking |
-| 3 | `merx://address/{address}/transactions` | Recent transactions with type and amounts |
-| 4 | `merx://address/{address}/delegations` | Active delegations with expiry times |
-| 5 | `merx://token/{token}/info` | Token metadata + price + transfer energy cost |
-| 6 | `merx://order/{order_id}/status` | Order details with fills and cost breakdown |
-| 7 | `merx://standing-order/{id}/status` | Standing order trigger state and executions |
-
-See [docs/RESOURCES.md](docs/RESOURCES.md) for content schemas and subscription details.
-
----
-
-## Configuration
-
-### Claude.ai (web) -- hosted SSE
-
-```json
-{
-  "mcpServers": {
-    "merx": {
-      "url": "https://merx.exchange/mcp/sse"
-    }
-  }
-}
-```
-
-Then use `set_api_key` and `set_private_key` tools in conversation to authenticate.
-
-### Cursor -- hosted SSE
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "merx": {
-      "url": "https://merx.exchange/mcp/sse"
-    }
-  }
-}
-```
-
-### Claude Code -- stdio
+### JavaScript / TypeScript
 
 ```bash
-claude mcp add merx -- npx merx
+npm install @merx/sdk
 ```
 
-Or add to `.claude/settings.json`:
+```typescript
+import { MerxClient } from '@merx/sdk'
 
-```json
-{
-  "mcpServers": {
-    "merx": {
-      "command": "npx merx",
-      "env": {
-        "MERX_API_KEY": "merx_sk_your_key",
-        "TRON_PRIVATE_KEY": "your_private_key"
-      }
-    }
-  }
-}
+const merx = new MerxClient({ apiKey: 'merx_sk_your_key' })
+
+// 4 modules: prices, orders, balance, webhooks
+const prices   = await merx.prices.list()
+const best     = await merx.prices.best({ resource: 'ENERGY' })
+const order    = await merx.orders.create({ ... })
+const status   = await merx.orders.get(order.id)
+const balance  = await merx.balance.get()
+const webhooks = await merx.webhooks.list()
 ```
 
-### Any MCP client -- local stdio
-
-```bash
-npm install -g merx
-```
-
-```json
-{
-  "mcpServers": {
-    "merx": {
-      "command": "npx merx",
-      "env": {
-        "MERX_API_KEY": "merx_sk_your_key",
-        "TRON_PRIVATE_KEY": "your_private_key"
-      }
-    }
-  }
-}
-```
-
-### Environment variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `MERX_API_KEY` | For trading | API key from merx.exchange. Or use `create_account` tool to get one in-session. Or use `set_api_key` tool. |
-| `TRON_PRIVATE_KEY` | For signing | Your TRON wallet private key. Never sent to any server. Used only for local TX signing. Or use `set_private_key` tool. |
-| `MERX_BASE_URL` | No | Override API URL. Default: `https://merx.exchange` |
-
-Note: No `TRONGRID_API_KEY` needed. merx manages all RPC infrastructure server-side.
-
-### Graceful degradation
-
-merx works with zero configuration. As you add keys, more tools become available.
-
-| Level | Keys | Available tools | Example capabilities |
-|---|---|---|---|
-| Read-only | None | 22 | `get_prices`, `analyze_prices`, `estimate_transaction_cost`, `get_account_info`, `get_swap_quote`, `explain_concept` |
-| Trading | `MERX_API_KEY` | 34 | + `create_order`, `ensure_resources`, `get_balance`, `create_standing_order`, `create_monitor` |
-| Full access | `MERX_API_KEY` + `TRON_PRIVATE_KEY` | 52 | + `transfer_trx`, `transfer_trc20`, `execute_swap`, `call_contract`, `execute_intent`, `deposit_trx` |
-
-See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for detailed setup guides and troubleshooting.
-
----
-
-## Tested on TRON mainnet
-
-Every tool was tested in production on TRON mainnet. These are not simulations --
-every TX hash is verifiable on [TronScan](https://tronscan.org).
-
-Testing date: 2026-03-30.
-
-| Category | Tool | TX Hash | Status | Details |
-|---|---|---|---|---|
-| Token Operations | `transfer_trx` | `b22813a813c3...990e7955` | SUCCESS | 0.1 TRX sent, 267 bandwidth consumed |
-| Payments | `deposit_trx` | `4bc60854f828...8ddcd509` | SUCCESS | 10 TRX deposited to Merx with memo, credited to balance |
-| Token Operations | `approve_trc20` | `56fc87f319b9...0bf5ffbb` | SUCCESS | USDT approval, 99,764 energy consumed |
-| Smart Contracts | `call_contract` | `fc55aee3dc50...4bb5c1bf` | SUCCESS | name() call on contract, 4,098 energy consumed |
-| DEX Swaps | `execute_swap` | `61424b1e89a0...d066d21577` | SUCCESS | 0.1 TRX -> 0.032 USDT via SunSwap V2, 223,354 energy (exactly as simulated) |
-| Resource Trading | `create_order` | `8adac3b8a859...4e69e4ca` | FILLED | 65,050 energy via Netts at 22 SUN, 1.43 TRX |
-| Payments | `create_paid_order` | `53236a5aeba0...984dec7b` | SUCCESS | x402 flow: 1.43 TRX invoice paid, 65,050 energy delegated |
-
-### Key findings from mainnet testing
-
-| Metric | Value |
+| Property | Value |
 |---|---|
-| Cheapest energy provider | Netts at 22 SUN/unit |
-| USDT transfer energy (typical) | 65,000 units |
-| USDT transfer cost (rented energy) | 1.43 TRX |
-| USDT transfer cost (burned) | 3-13 TRX |
-| Maximum savings observed | 94% |
-| SunSwap swap energy (0.1 TRX -> USDT) | 223,354 units (exact simulation match) |
-| SunSwap swap output | 0.032094 USDT for 0.1 TRX |
-| x402 payment flow | Invoice -> pay -> verify -> order -> fill -> delegate (one tool call) |
-| Energy delegation confirmation | 2-6 seconds after order fill |
+| Package | `@merx/sdk` |
+| Modules | `prices`, `orders`, `balance`, `webhooks` |
+| Methods | 16 |
+| TypeScript | Full type definitions included |
+| Dependencies | Zero |
+| Node.js | 18+ |
+
+### Python
+
+```bash
+pip install merx-sdk
+```
+
+```python
+from merx import MerxClient
+
+merx = MerxClient(api_key="merx_sk_your_key")
+
+# Same 4 modules, snake_case
+prices  = merx.prices.list()
+best    = merx.prices.best(resource="ENERGY")
+order   = merx.orders.create(resource_type="ENERGY", amount=65000, ...)
+status  = merx.orders.get(order.id)
+balance = merx.balance.get()
+```
+
+| Property | Value |
+|---|---|
+| Package | `merx-sdk` |
+| Modules | `prices`, `orders`, `balance`, `webhooks` |
+| Methods | 16 |
+| Type hints | Full type annotations |
+| Dependencies | Zero |
+| Python | 3.11+ |
+
+### REST API
+
+No SDK required. All endpoints accept JSON and return JSON.
+
+```bash
+# Get prices (public, no auth)
+curl https://merx.exchange/api/v1/prices
+
+# Get best price for energy
+curl https://merx.exchange/api/v1/prices/best?resource=ENERGY
+
+# Create order (authenticated)
+curl -X POST https://merx.exchange/api/v1/orders \
+  -H "Authorization: Bearer merx_sk_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{"resource_type":"ENERGY","amount":65000,"duration_sec":300,"target_address":"TAddr..."}'
+
+# Check balance
+curl https://merx.exchange/api/v1/balance \
+  -H "Authorization: Bearer merx_sk_your_key"
+```
 
 ---
 
-## Comparison with alternatives
+## Real-time data
 
-Factual comparison based on publicly available information. Last updated 2026-03-30.
+### WebSocket
 
-| Feature | merx | Sun Protocol | Netts MCP | TronLink MCP | PowerSun MCP |
-|---|---|---|---|---|---|
-| Tools | 52 | ~20 | ~10 | 27 | 27 |
-| Prompts | 30 | 0 | 0 | 0 | 0 |
-| Resources | 21 | 0 | 0 | 0 | 0 |
-| Transport | stdio + SSE | stdio | stdio | stdio | SSE |
-| Energy providers | 7 | 0 | 1 | 0 | 1 |
-| Bandwidth support | Yes | No | No | No | No |
-| Auto resource purchase | Energy + BW | No | No | No | Energy only |
-| Exact energy simulation | Yes | No | No | No | No |
-| Intent execution | Yes | No | No | No | No |
-| Transaction simulation | Yes | No | No | No | No |
-| Standing orders (24/7) | Yes | No | No | No | No |
-| Delegation monitors | Yes | No | No | No | No |
-| Self-service onboarding | Yes | No | No | No | Yes |
-| x402 pay-per-use | Yes | No | No | No | No |
-| DEX swaps | Yes | No | No | No | Yes |
-| Zero install option | Yes (SSE) | No | No | No | Yes (SSE) |
-| Private key required | Optional | Yes | Yes | Yes | No |
-| Tested on mainnet | 7 TX verified | Unknown | Unknown | Unknown | Unknown |
+Connect to `wss://merx.exchange/ws` for real-time price updates.
 
-merx focuses on resource economics and transaction optimization. Other servers focus
-on general blockchain operations. merx covers both.
+```javascript
+const ws = new WebSocket('wss://merx.exchange/ws')
 
----
+ws.onopen = () => {
+  // Subscribe to all energy price updates
+  ws.send(JSON.stringify({ type: 'subscribe', channel: 'prices', resource: 'ENERGY' }))
+}
 
-## How it works
-
-### Energy and bandwidth on TRON
-
-Every operation on TRON consumes two resources:
-
-| Resource | Purpose | Free daily | What happens without it |
-|---|---|---|---|
-| Energy | Smart contract execution (USDT transfers, swaps, approvals) | 0 (must stake or rent) | TRX burned at network rate |
-| Bandwidth | Transaction serialization (every TX needs some) | 600 bytes/day | TRX burned at network rate |
-
-Energy is the expensive one. A USDT transfer needs approximately 65,000 energy units.
-Without rented energy, the network burns 3-13 TRX from the sender. With energy rented
-at current market rates (22 SUN/unit from Netts), the same transfer costs 1.43 TRX.
-
-### How merx routes orders
-
-```mermaid
-graph LR
-    Order[Order: 65,000 ENERGY]
-    N[Netts<br>22 SUN]
-    C[CatFee<br>27 SUN]
-    T[TEM<br>35 SUN]
-    I[ITRX<br>42 SUN]
-    TS[TronSave<br>50 SUN]
-    P[PowerSun<br>80 SUN]
-
-    Order -->|Route to cheapest| N
-    N -.->|Fallback if unavailable| C
-    C -.->|Fallback| T
-    T -.->|Fallback| I
-    I -.->|Fallback| TS
-    TS -.->|Fallback| P
-
-    style Order fill:#1a1a2e,stroke:#B8963E,color:#F5F0E8
-    style N fill:#0C0B09,stroke:#B8963E,color:#F5F0E8
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  // { provider: "netts", resource: "ENERGY", price_sun: 22, available: 100000000, ... }
+}
 ```
 
-<details>
-<summary>ASCII diagram (if Mermaid does not render)</summary>
+| Property | Value |
+|---|---|
+| Endpoint | `wss://merx.exchange/ws` |
+| Channels | `prices`, `orders`, `balance` |
+| Update frequency | Every 30 seconds for prices |
+| Heartbeat | Every 30 seconds |
+| Reconnect | Client-side with exponential backoff recommended |
 
-```
-Order: 65,000 ENERGY
-    |
-    | Route to cheapest
-    v
-Netts (22 SUN)
-    |
-    | Fallback if unavailable
-    v
-CatFee (27 SUN)
-    |
-    v
-TEM (35 SUN)
-    |
-    v
-ITRX (42 SUN)
-    |
-    v
-TronSave (50 SUN)
-    |
-    v
-PowerSun (80 SUN)
+### Webhooks
+
+Register webhook endpoints to receive HTTP POST notifications for account events.
+
+```bash
+curl -X POST https://merx.exchange/api/v1/webhooks \
+  -H "Authorization: Bearer merx_sk_your_key" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://your-app.com/webhook","events":["order.filled","deposit.received"]}'
 ```
 
-</details>
+| Event | Fired when |
+|---|---|
+| `order.filled` | Energy or bandwidth order has been filled by a provider |
+| `order.failed` | Order failed after all provider attempts exhausted |
+| `deposit.received` | TRX deposit confirmed and credited to balance |
+| `withdrawal.completed` | TRX withdrawal broadcast and confirmed on-chain |
 
-### Price comparison (2026-03-30)
-
-| Provider | Type | Price (SUN) | Price (TRX per 65K) | Available | Durations |
-|---|---|---|---|---|---|
-| Netts | Fixed | 22 | 1.43 | 100,000,000 | 5m, 1h |
-| CatFee | Fixed | 27 | 1.76 | 2,085,535,282 | 1h |
-| TEM | P2P | 35 | 2.28 | 177,991,103 | 5m, 1h, 3h, 12h, 1d-30d |
-| ITRX | Fixed | 42 | 2.73 | 10,161,061 | 1h, 1d, 3d, 30d |
-| TronSave | P2P | 50 | 3.25 | 40,136,084 | flexible |
-| PowerSun | Fixed | 80 | 5.20 | 29,780,366 | 2m-30d |
-
-Prices are per energy unit. 1 TRX = 1,000,000 SUN. The "Price (TRX per 65K)" column
-shows the cost for one USDT transfer worth of energy (65,000 units).
-
-### Savings calculator
-
-| Scenario | Burn cost | Rental cost (Netts) | Savings |
-|---|---|---|---|
-| 1 USDT transfer | 3-13 TRX | 1.43 TRX | 56-89% |
-| 10 USDT transfers | 30-130 TRX | 14.30 TRX | 52-89% |
-| 100 USDT transfers/day | 300-1,300 TRX | 143 TRX | 52-89% |
-| SunSwap swap (small) | ~50 TRX | ~4.91 TRX | ~90% |
-| Contract call (simple) | ~1 TRX | ~0.09 TRX | ~91% |
-
-Numbers assume Netts at 22 SUN. Actual burn cost varies by recipient address state
-(whether it has held the token before).
+**Security:** Every webhook request includes an `X-Merx-Signature` header containing
+an HMAC-SHA256 signature computed with your webhook secret. Verify this signature
+before processing. Failed deliveries are retried with exponential backoff.
 
 ---
 
 ## Payment methods
 
-merx supports three ways to pay for energy and bandwidth:
+MERX supports three ways to pay for energy and bandwidth.
 
-### 1. Pre-funded Merx balance
+### 1. Pre-funded MERX balance
 
-Deposit TRX to your Merx account via the dashboard at merx.exchange. Trade directly
-from your balance. Best for high-volume users.
+Deposit TRX to your MERX account via the dashboard at merx.exchange or via the API.
+Trade directly from your balance. Best for high-volume users and teams.
 
-```
-Agent: get_balance()
--> Available: 45.20 TRX | Locked: 1.43 TRX | Total: 46.63 TRX
+```bash
+# Check balance
+curl https://merx.exchange/api/v1/balance \
+  -H "Authorization: Bearer merx_sk_your_key"
+
+# Response
+# { "available_trx": 45.20, "locked_trx": 1.43, "total_trx": 46.63 }
 ```
 
 ### 2. Self-deposit from agent wallet
 
-The agent deposits TRX to Merx from its own wallet using the `deposit_trx` tool.
-The tool builds a TRX transfer with the correct memo, signs it locally, and
+The agent deposits TRX to MERX from its own wallet using the `deposit_trx` tool or
+API. The tool builds a TRX transfer with the correct memo, signs it locally, and
 broadcasts. Balance is credited in 1-2 minutes.
 
 ```
-Agent: deposit_trx(amount: 10)
+deposit_trx(amount: 10)
 -> TX: 4bc60854f828...8ddcd509
--> 10 TRX deposited. Will be credited to your Merx balance shortly.
+-> 10 TRX deposited. Will be credited to your MERX balance shortly.
 ```
 
 ### 3. x402 pay-per-use
 
-No account needed. No pre-deposit. The agent creates an invoice, pays with TRX from
-its own wallet, and receives energy delegation directly. Complete flow in one tool
+No account needed. No pre-deposit. Create an invoice, pay with TRX from any wallet,
+and receive energy delegation directly. Complete flow in one API call or one tool
 call via `create_paid_order`.
 
 ```
-Agent: create_paid_order(amount: 65000, duration_sec: 300,
+create_paid_order(amount: 65000, duration_sec: 300,
   resource_type: "ENERGY", target_address: "THT49...")
 -> Invoice: inv_f41ffc2f...
 -> Payment TX: 53236a5a...
@@ -1134,32 +959,34 @@ See [docs/PAYMENT-METHODS.md](docs/PAYMENT-METHODS.md) for detailed flow diagram
 
 ---
 
-## Standing orders
+## Standing orders and monitors
 
-Server-side 24/7 automation that runs even when the agent is offline. Stored in
-PostgreSQL, survives restarts.
+### Standing orders
 
-### Trigger types
+Server-side 24/7 automation stored in PostgreSQL. Persists across restarts. Works
+when the client is offline.
+
+**Trigger types:**
 
 | Trigger | Description | Example |
 |---|---|---|
 | `price_below` | Fire when best price drops below threshold | Buy 65,000 energy when price < 20 SUN |
 | `price_above` | Fire when best price exceeds threshold | Alert when energy exceeds 50 SUN |
 | `schedule` | Cron-based schedule | Buy energy every day at 03:00 UTC |
-| `balance_below` | Fire when Merx balance drops below threshold | Auto-deposit 50 TRX when balance < 10 TRX |
+| `balance_below` | Fire when MERX balance drops below threshold | Auto-deposit 50 TRX when balance < 10 TRX |
 
-### Action types
+**Action types:**
 
 | Action | Description |
 |---|---|
 | `buy_resource` | Buy specified amount of energy or bandwidth |
 | `ensure_resources` | Ensure minimum resources on target address |
-| `notify_only` | Send notification via webhook or Telegram |
+| `notify_only` | Send notification via webhook |
 
-### Example: Buy cheap energy automatically
+**Example:**
 
 ```
-Agent: create_standing_order(
+create_standing_order(
   trigger: { type: "price_below", resource: "ENERGY", threshold_sun: 20 },
   action: { type: "buy_resource", amount: 65000, duration_sec: 300 },
   target_address: "TLyqz...",
@@ -1167,34 +994,28 @@ Agent: create_standing_order(
   budget_trx: 15
 )
 
-merx returns:
-  Standing Order: so_a1b2c3d4
-  Status: ACTIVE
-  Trigger: ENERGY price < 20 SUN
-  Action: Buy 65,000 energy (5m)
-  Budget: 15 TRX (10 executions max)
-  Target: TLyqz...
+-> Standing Order: so_a1b2c3d4
+-> Status: ACTIVE
+-> Trigger: ENERGY price < 20 SUN
+-> Action: Buy 65,000 energy (5m)
+-> Budget: 15 TRX (10 executions max)
 ```
 
----
+### Delegation monitors
 
-## Delegation monitors
+Watch delegations and resources on any address. Alert before expiry. Auto-renew
+with configurable max price.
 
-Watch delegations and resources on any address. Alert before expiry.
-Auto-renew with configurable max price.
-
-### Monitor types
-
-| Type | Description | Example |
+| Monitor type | Description | Example |
 |---|---|---|
 | `delegation_expiry` | Alert before energy/bandwidth delegation expires | Alert 5 minutes before expiry, auto-renew at max 30 SUN |
 | `balance_threshold` | Alert when TRX balance drops below threshold | Alert when balance < 5 TRX |
 | `price_alert` | Alert on price movements | Alert when energy price drops below 20 SUN |
 
-### Example: Auto-renew energy delegation
+**Example:**
 
 ```
-Agent: create_monitor(
+create_monitor(
   type: "delegation_expiry",
   address: "TLyqz...",
   resource: "ENERGY",
@@ -1203,179 +1024,56 @@ Agent: create_monitor(
   max_price_sun: 30
 )
 
-merx returns:
-  Monitor: mon_e5f6g7h8
-  Status: ACTIVE
-  Type: delegation_expiry
-  Address: TLyqz...
-  Alert: 5 minutes before expiry
-  Auto-renew: Yes (max 30 SUN)
+-> Monitor: mon_e5f6g7h8
+-> Status: ACTIVE
+-> Type: delegation_expiry
+-> Alert: 5 minutes before expiry
+-> Auto-renew: Yes (max 30 SUN)
 ```
 
 ---
 
-## Intent execution
+## Savings calculator
 
-Execute multi-step plans with resource optimization. merx handles the entire
-lifecycle: simulate resources for all steps, purchase in batch, execute sequentially.
+Energy is the expensive resource on TRON. These numbers show the cost difference
+between burning TRX (no energy) and renting energy through MERX.
 
-### Supported step actions
+| Resource | Purpose | Free daily | Without it |
+|---|---|---|---|
+| Energy | Smart contract execution (USDT transfers, swaps, approvals) | 0 (must stake or rent) | TRX burned at network rate |
+| Bandwidth | Transaction serialization (every TX needs some) | 600 bytes/day | TRX burned at network rate |
 
-| Action | Description | Required params |
-|---|---|---|
-| `transfer_trx` | Send TRX | `to`, `amount` |
-| `transfer_trc20` | Send TRC-20 token | `token`, `to`, `amount` |
-| `approve_trc20` | Approve token spending | `token`, `spender`, `amount` |
-| `execute_swap` | SunSwap token swap | `from_token`, `to_token`, `amount` |
-| `call_contract` | Execute contract function | `contract`, `function`, `params` |
+### Cost comparison
 
-### Resource strategies
+| Scenario | Burn cost (no energy) | Rental cost (MERX) | Savings |
+|---|---|---|---|
+| 1 USDT transfer | 3-13 TRX | 1.43 TRX | 56-89% |
+| 10 USDT transfers | 30-130 TRX | 14.30 TRX | 52-89% |
+| 100 USDT transfers/day | 300-1,300 TRX | 143 TRX | 52-89% |
+| SunSwap swap (small) | ~50 TRX | ~4.91 TRX | ~90% |
+| Contract call (simple) | ~1 TRX | ~0.09 TRX | ~91% |
 
-| Strategy | Description | Best for |
-|---|---|---|
-| `batch_cheapest` | Buy all energy at once before executing any step | Multiple same-type operations |
-| `per_step` | Buy energy before each individual step | Mixed operations with different energy needs |
-| `no_resources` | Skip resource purchase (assume resources available) | Pre-funded addresses |
+Numbers assume the cheapest available provider at time of order. Actual burn cost
+varies by recipient address state (whether it has held the token before).
 
-### Stateful simulation
+### How it works
 
-When simulating multi-step plans, merx tracks resource consumption across steps.
-Energy consumed by step 1 is not available for step 2. This ensures accurate total
-cost estimates.
-
-```
-Agent: simulate(steps: [
-  { action: "transfer_trc20", params: { token: "USDT", to: "TAddr1", amount: "500" } },
-  { action: "transfer_trc20", params: { token: "USDT", to: "TAddr2", amount: "300" } },
-  { action: "execute_swap", params: { from_token: "TRX", to_token: "USDT", amount: "10" } }
-])
-
-merx returns:
-  Step 1: transfer_trc20 - 500 USDT -> TAddr1
-    Energy: ~65,000 | Bandwidth: ~345
-  Step 2: transfer_trc20 - 300 USDT -> TAddr2
-    Energy: ~65,000 | Bandwidth: ~345
-  Step 3: execute_swap - 10 TRX -> USDT
-    Energy: ~223,354 | Bandwidth: ~400
-
-  Total energy: 353,354 | Total bandwidth: 1,090
-  Rental cost: ~7.77 TRX
-  Burn alternative: ~105.50 TRX
-  Savings: 93%
-```
-
----
-
-## SDK integration
-
-### JavaScript / TypeScript
-
-```typescript
-import { MerxClient } from "merx";
-
-const merx = new MerxClient({
-  apiKey: "merx_sk_your_key",
-});
-
-// Get best energy price
-const prices = await merx.prices.getAll({ resource: "ENERGY" });
-console.log(prices[0]); // { provider: "netts", price_sun: 22, available: 100000000 }
-
-// Buy energy
-const order = await merx.orders.create({
-  resource_type: "ENERGY",
-  amount: 65000,
-  duration_sec: 300,
-  target_address: "TLyqz...",
-});
-console.log(order.status); // "FILLED"
-console.log(order.cost_trx); // 1.4311
-```
-
-### Python
-
-```python
-from merx import MerxClient
-
-merx = MerxClient(api_key="merx_sk_your_key")
-
-# Get best energy price
-prices = merx.prices.get_all(resource="ENERGY")
-print(prices[0])  # {"provider": "netts", "price_sun": 22, "available": 100000000}
-
-# Buy energy
-order = merx.orders.create(
-    resource_type="ENERGY",
-    amount=65000,
-    duration_sec=300,
-    target_address="TLyqz..."
-)
-print(order.status)   # "FILLED"
-print(order.cost_trx) # 1.4311
-```
-
-### REST API
-
-```bash
-# Get energy prices
-curl https://merx.exchange/api/v1/prices?resource=ENERGY
-
-# Create order
-curl -X POST https://merx.exchange/api/v1/orders \
-  -H "Authorization: Bearer merx_sk_your_key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "resource_type": "ENERGY",
-    "amount": 65000,
-    "duration_sec": 300,
-    "target_address": "TLyqz..."
-  }'
-```
-
-See [API Reference](https://merx.exchange/docs/api-reference) for all endpoints.
-
----
-
-## Security
-
-### Private key handling
-
-- Private keys are set via environment variable (`TRON_PRIVATE_KEY`) or the
-  `set_private_key` tool in-session
-- Keys never leave the MCP process. All transaction signing happens locally
-- The Merx API never receives private keys
-- The `set_private_key` tool derives the TRON address automatically via TronWeb --
-  the user only provides the 64-character hex key
-
-### API key handling
-
-- API keys authenticate with the Merx API for trading operations
-- Keys can be set via environment variable (`MERX_API_KEY`) or the `set_api_key`
-  tool in-session
-- Create an account and get an API key without leaving the conversation using the
-  `create_account` tool
-
-### What merx can and cannot do
-
-| With private key | Without private key |
-|---|---|
-| Sign and broadcast transactions | Read-only operations only |
-| Send TRX and TRC-20 tokens | Check prices and balances |
-| Execute swaps | Get swap quotes |
-| Approve contracts | Estimate costs |
-| Deposit TRX to Merx | View market data |
+1 TRX = 1,000,000 SUN. Energy is priced in SUN per unit. A USDT transfer needs
+approximately 65,000 energy units. At 22 SUN per unit, that is 65,000 x 22 =
+1,430,000 SUN = 1.43 TRX. Without energy, the network burns 3-13 TRX from the
+sender depending on the recipient's account state.
 
 ---
 
 ## Error handling
 
-All errors follow a standard format:
+All errors follow a standard format across API, SDKs, and MCP:
 
 ```json
 {
   "error": {
     "code": "INSUFFICIENT_BALANCE",
-    "message": "Merx balance too low. Need 1.43 TRX, have 0.50 TRX.",
+    "message": "MERX balance too low. Need 1.43 TRX, have 0.50 TRX.",
     "details": {
       "required_trx": 1.43,
       "available_trx": 0.50
@@ -1388,207 +1086,111 @@ All errors follow a standard format:
 
 | Code | Description | Resolution |
 |---|---|---|
-| `INSUFFICIENT_BALANCE` | Merx account balance too low | Deposit TRX via dashboard or `deposit_trx` tool |
+| `INSUFFICIENT_BALANCE` | MERX account balance too low | Deposit TRX via dashboard or `deposit_trx` |
 | `PROVIDER_UNAVAILABLE` | All providers failed for this order | Try again later or increase max price |
 | `INVALID_ADDRESS` | TRON address format invalid | Check address starts with T and is 34 characters |
 | `DELEGATION_TIMEOUT` | Energy delegation did not arrive within timeout | Check order status with `get_order` |
 | `SIMULATION_FAILED` | Contract call simulation failed | Check contract address and function parameters |
-| `PRIVATE_KEY_REQUIRED` | Operation requires TRON private key | Call `set_private_key` or set `TRON_PRIVATE_KEY` env var |
-| `API_KEY_REQUIRED` | Operation requires Merx API key | Call `set_api_key` or set `MERX_API_KEY` env var |
+| `PRIVATE_KEY_REQUIRED` | Operation requires TRON private key | Set `TRON_PRIVATE_KEY` env var or call `set_private_key` |
+| `API_KEY_REQUIRED` | Operation requires MERX API key | Set `MERX_API_KEY` env var or call `set_api_key` |
 | `ORDER_MIN_AMOUNT` | Amount below minimum order size | Energy minimum: 65,000. Bandwidth minimum: 1,500 |
 
 ---
 
-## Frequently asked questions
+## Security
 
-### Is merx free to use?
+### Private key handling
 
-Read-only tools (22 tools) are free with no account. You pay only for energy and
-bandwidth purchases -- the cost goes to the provider (Netts, CatFee, etc.). Merx
-adds a small routing fee.
+- Private keys are set via environment variable (`TRON_PRIVATE_KEY`) or the
+  `set_private_key` tool in-session.
+- Keys never leave the client process. All transaction signing happens locally.
+- The MERX API never receives private keys.
+- The `set_private_key` tool derives the TRON address automatically -- the user
+  only provides the 64-character hex key.
 
-### Do I need a TronGrid API key?
+### API key handling
 
-No. merx manages all RPC infrastructure server-side. You never need to configure
-TronGrid, Tatum, or any other TRON RPC provider.
+- API keys authenticate with the MERX API for trading operations.
+- Keys can be set via environment variable (`MERX_API_KEY`) or the `set_api_key`
+  tool in-session.
+- Create an account and get an API key without leaving the conversation using the
+  `create_account` tool.
 
-### Is my private key safe?
+### What MERX can and cannot do
 
-Your private key never leaves the MCP process running on your machine. All transaction
-signing happens locally. The Merx API receives only signed transaction bytes, never
-the key itself. When using SSE transport, the key stays in the browser/client -- it
-is sent to the MCP server process but never forwarded to the API.
-
-### What is the minimum order size?
-
-Energy: 65,000 units (approximately 1.43 TRX at current rates).
-Bandwidth: 1,500 units.
-
-### How fast is energy delegation?
-
-After an order is filled, energy appears on the target address within 2-6 seconds.
-merx polls `check_address_resources` every 2 seconds and only proceeds with the
-transaction once delegation is confirmed on-chain.
-
-### What happens if a provider is down?
-
-merx automatically falls back to the next cheapest provider. If Netts is unavailable,
-the order routes to CatFee (27 SUN). If CatFee is also down, it tries TEM (35 SUN),
-and so on through all 7 providers.
-
-### Can I use merx for mainnet and testnet?
-
-merx is configured for TRON mainnet by default. For Shasta testnet, set
-`MERX_BASE_URL` to a testnet-compatible endpoint. Note: most energy providers only
-operate on mainnet.
-
-### What is x402?
-
-x402 is a pay-per-use payment flow. The agent creates an invoice for the energy
-cost, pays with TRX from its own wallet, and receives the delegation -- all without
-creating a Merx account or pre-depositing funds. It is named after the HTTP 402
-Payment Required status code.
-
-### How are SUN and TRX related?
-
-1 TRX = 1,000,000 SUN. Energy prices are quoted in SUN per unit. To convert: if
-energy costs 22 SUN per unit and you need 65,000 units, the total is
-22 * 65,000 = 1,430,000 SUN = 1.43 TRX.
-
----
-
-## Glossary
-
-| Term | Definition |
+| With private key | Without private key |
 |---|---|
-| Energy | Resource consumed by smart contract execution on TRON. Without it, TRX is burned as fee. |
-| Bandwidth | Resource consumed by transaction serialization. Every TX needs some. 600 bytes/day free. |
-| SUN | Smallest unit of TRX. 1 TRX = 1,000,000 SUN. Energy prices are quoted in SUN. |
-| Delegation | Temporary assignment of energy or bandwidth from one address to another. |
-| Burn | When TRX is permanently destroyed to pay for resources the sender does not have. |
-| Provider | A service that delegates energy or bandwidth for a fee (Netts, CatFee, TEM, etc.). |
-| Standing order | A server-side rule that triggers energy purchases based on price, schedule, or balance. |
-| Monitor | A persistent watcher for delegation expiry, balance changes, or price movements. |
-| x402 | Pay-per-use flow: invoice -> pay -> verify -> order. No account needed. |
-| Intent | A multi-step execution plan (transfer + swap + transfer) with batched resource optimization. |
-| TRC-20 | Token standard on TRON (equivalent to ERC-20 on Ethereum). USDT is the most common TRC-20 token. |
+| Sign and broadcast transactions | Read-only operations only |
+| Send TRX and TRC-20 tokens | Check prices and balances |
+| Execute swaps | Get swap quotes |
+| Approve contracts | Estimate costs |
+| Deposit TRX to MERX | View market data |
 
 ---
 
-## API endpoints
+## Tested on mainnet
 
-The MCP server communicates with these Merx API endpoints. Most users interact
-through MCP tools, not the API directly.
+Every capability was tested in production on TRON mainnet. These are not simulations --
+every TX hash is verifiable on [TronScan](https://tronscan.org).
 
-### Core endpoints
+### Verified transactions
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/v1/prices` | Energy and bandwidth prices from all providers |
-| GET | `/api/v1/prices/best` | Best price for given resource and amount |
-| GET | `/api/v1/prices/analysis` | Market analysis with trends |
-| GET | `/api/v1/prices/history` | Historical price data |
-| POST | `/api/v1/orders` | Create energy/bandwidth order |
-| GET | `/api/v1/orders/:id` | Order details |
-| GET | `/api/v1/orders` | List orders |
-| GET | `/api/v1/balance` | Account balance |
-| GET | `/api/v1/deposit-info` | Deposit address and memo |
-| GET | `/api/v1/transactions` | Transaction history |
-| POST | `/api/v1/estimate` | Estimate transaction resources |
-| GET | `/api/v1/providers` | Provider list with status |
+| Category | Operation | TX Hash | Status | Details |
+|---|---|---|---|---|
+| Token Operations | `transfer_trx` | `b22813a813c3...990e7955` | SUCCESS | 0.1 TRX sent, 267 bandwidth consumed |
+| Payments | `deposit_trx` | `4bc60854f828...8ddcd509` | SUCCESS | 10 TRX deposited to MERX with memo, credited to balance |
+| Token Operations | `approve_trc20` | `56fc87f319b9...0bf5ffbb` | SUCCESS | USDT approval, 99,764 energy consumed |
+| Smart Contracts | `call_contract` | `fc55aee3dc50...4bb5c1bf` | SUCCESS | name() call on contract, 4,098 energy consumed |
+| DEX Swaps | `execute_swap` | `61424b1e89a0...d066d21577` | SUCCESS | 0.1 TRX -> 0.032 USDT via SunSwap V2, 223,354 energy (exactly as simulated) |
+| Resource Trading | `create_order` | `8adac3b8a859...4e69e4ca` | FILLED | 65,050 energy via Netts at 22 SUN, 1.43 TRX |
+| Payments | `create_paid_order` | `53236a5aeba0...984dec7b` | SUCCESS | x402 flow: 1.43 TRX invoice paid, 65,050 energy delegated |
 
-### Chain proxy endpoints
+### Key findings from mainnet testing
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/v1/chain/account/:address` | On-chain account info |
-| GET | `/api/v1/chain/resources/:address` | Energy and bandwidth for address |
-| GET | `/api/v1/chain/transaction/:txid` | Transaction details |
-| GET | `/api/v1/chain/block/:number` | Block info |
-| POST | `/api/v1/chain/broadcast` | Broadcast signed transaction |
-| GET | `/api/v1/chain/parameters` | Network parameters |
-| POST | `/api/v1/chain/trigger-constant` | Simulate contract call |
-
-### x402 endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/x402/invoice` | Create payment invoice |
-| POST | `/api/v1/x402/verify` | Verify payment TX |
-
-### Standing orders and monitors
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/standing-orders` | Create standing order |
-| GET | `/api/v1/standing-orders` | List standing orders |
-| DELETE | `/api/v1/standing-orders/:id` | Cancel standing order |
-| POST | `/api/v1/monitors` | Create monitor |
-| GET | `/api/v1/monitors` | List monitors |
-| DELETE | `/api/v1/monitors/:id` | Cancel monitor |
-
-See [API Reference](https://merx.exchange/docs/api-reference) for request/response schemas.
+| Metric | Value |
+|---|---|
+| USDT transfer energy (typical) | 65,000 units |
+| USDT transfer cost (rented energy) | 1.43 TRX |
+| USDT transfer cost (burned) | 3-13 TRX |
+| Maximum savings observed | 94% |
+| SunSwap swap energy (0.1 TRX -> USDT) | 223,354 units (exact simulation match) |
+| SunSwap swap output | 0.032094 USDT for 0.1 TRX |
+| x402 payment flow | Invoice -> pay -> verify -> order -> fill -> delegate (one call) |
+| Energy delegation confirmation | 2-6 seconds after order fill |
 
 ---
 
-## Idempotency
+## Comparison with alternatives
 
-All mutating operations support idempotency via the `Idempotency-Key` header:
+Factual comparison based on publicly available information.
 
-```bash
-curl -X POST https://merx.exchange/api/v1/orders \
-  -H "Authorization: Bearer merx_sk_your_key" \
-  -H "Idempotency-Key: unique-request-id-123" \
-  -H "Content-Type: application/json" \
-  -d '{"resource_type": "ENERGY", "amount": 65000, "duration_sec": 300}'
-```
+| Feature | MERX | Sun Protocol | Netts MCP | TronLink MCP | PowerSun MCP |
+|---|---|---|---|---|---|
+| MCP Tools | 52 | ~20 | ~10 | 27 | 27 |
+| MCP Prompts | 30 | 0 | 0 | 0 | 0 |
+| MCP Resources | 21 | 0 | 0 | 0 | 0 |
+| REST API | 33 endpoints | No | No | No | No |
+| JavaScript SDK | Yes | No | No | No | No |
+| Python SDK | Yes | No | No | No | No |
+| WebSocket | Yes | No | No | No | No |
+| Web exchange | Yes | No | No | No | No |
+| Transport | stdio + SSE | stdio | stdio | stdio | SSE |
+| Energy providers | All connected | 0 | 1 | 0 | 1 |
+| Bandwidth support | Yes | No | No | No | No |
+| Auto resource purchase | Energy + BW | No | No | No | Energy only |
+| Exact energy simulation | Yes | No | No | No | No |
+| Intent execution | Yes | No | No | No | No |
+| Standing orders (24/7) | Yes | No | No | No | No |
+| Delegation monitors | Yes | No | No | No | No |
+| x402 pay-per-use | Yes | No | No | No | No |
+| DEX swaps | Yes | No | No | No | Yes |
+| Zero install option | Yes (SSE) | No | No | No | Yes (SSE) |
+| Private key required | Optional | Yes | Yes | Yes | No |
+| Webhooks | Yes | No | No | No | No |
+| Tested on mainnet | 7 TX verified | Unknown | Unknown | Unknown | Unknown |
 
-If the same `Idempotency-Key` is sent again, the API returns the original response
-without creating a duplicate order. Keys expire after 24 hours.
-
-Supported on: `POST /orders`, `POST /withdraw`, `POST /x402/invoice`.
-
----
-
-## Rate limits
-
-| Endpoint group | Limit | Window |
-|---|---|---|
-| Price queries (`/prices/*`) | 60 requests | Per minute |
-| Order operations (`/orders/*`) | 30 requests | Per minute |
-| Chain queries (`/chain/*`) | 120 requests | Per minute |
-| Account operations (`/balance`, `/deposit-info`) | 30 requests | Per minute |
-
-Rate limit headers are included in every response:
-
-```
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 58
-X-RateLimit-Reset: 1743321600
-```
-
----
-
-## Changelog
-
-### v1.0.0 (2026-03-30)
-
-Initial release.
-
-- 52 tools covering the full TRON resource lifecycle
-- 30 prompts for common workflows
-- 21 resources (14 static + 7 templates) for live data
-- 7 energy providers: Netts, CatFee, TEM, ITRX, TronSave, Feee, PowerSun
-- Resource-aware transactions: auto energy + bandwidth for all write operations
-- Exact energy simulation for DEX swaps via `triggerConstantContract`
-- Intent execution engine with stateful simulation
-- Standing orders with 4 trigger types (price_below, price_above, schedule, balance_below)
-- Delegation monitors with auto-renewal
-- x402 pay-per-use flow (no account required)
-- Self-deposit from agent wallet
-- Auto-deposit configuration
-- Dual transport: stdio + SSE
-- Tested on TRON mainnet with 7 verified transactions
+MERX covers resource economics, transaction optimization, and general blockchain
+operations. Other servers focus on one area.
 
 ---
 
@@ -1596,19 +1198,20 @@ Initial release.
 
 | | |
 |---|---|
-| Full docs | [merx.exchange/docs](https://merx.exchange/docs) |
-| API reference | [merx.exchange/docs/api](https://merx.exchange/docs/api-reference) |
-| Tool reference | [docs/TOOLS.md](docs/TOOLS.md) |
-| Prompt catalog | [docs/PROMPTS.md](docs/PROMPTS.md) |
-| Resource catalog | [docs/RESOURCES.md](docs/RESOURCES.md) |
-| Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
-| Examples | [docs/EXAMPLES.md](docs/EXAMPLES.md) |
+| Platform | [merx.exchange](https://merx.exchange) |
+| Documentation | [merx.exchange/docs](https://merx.exchange/docs) |
+| API Reference | [merx.exchange/docs/api-reference](https://merx.exchange/docs/api-reference) |
+| MCP Tools | [docs/TOOLS.md](docs/TOOLS.md) |
+| MCP Prompts | [docs/PROMPTS.md](docs/PROMPTS.md) |
+| MCP Resources | [docs/RESOURCES.md](docs/RESOURCES.md) |
 | Configuration | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) |
+| Examples | [docs/EXAMPLES.md](docs/EXAMPLES.md) |
 | Comparison | [docs/COMPARISON.md](docs/COMPARISON.md) |
-| Payment methods | [docs/PAYMENT-METHODS.md](docs/PAYMENT-METHODS.md) |
-| Intent guide | [docs/INTENT-GUIDE.md](docs/INTENT-GUIDE.md) |
-| Standing orders guide | [docs/STANDING-ORDERS-GUIDE.md](docs/STANDING-ORDERS-GUIDE.md) |
-| Contributing | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) |
+| Intent Guide | [docs/INTENT-GUIDE.md](docs/INTENT-GUIDE.md) |
+| Standing Orders | [docs/STANDING-ORDERS-GUIDE.md](docs/STANDING-ORDERS-GUIDE.md) |
+| Payment Methods | [docs/PAYMENT-METHODS.md](docs/PAYMENT-METHODS.md) |
+| Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Changelog | [docs/CHANGELOG.md](docs/CHANGELOG.md) |
 
 ---
 
