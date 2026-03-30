@@ -3,7 +3,9 @@
 
 **The first TRON resource exchange.**
 
-[![npm version](https://img.shields.io/npm/v/merx.svg)](https://www.npmjs.com/package/merx)
+<a href="https://glama.ai/mcp/servers/Hovsteder/merx-mcp"><img width="380" height="200" src="https://glama.ai/mcp/servers/Hovsteder/merx-mcp/badge" alt="MERX MCP server" /></a>
+
+[![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Tools](https://img.shields.io/badge/tools-52-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)

@@ -1,10 +1,44 @@
 {
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "merx-mcp",
-  "description": "TRON resource exchange - 52 tools for AI agents. Energy trading, token transfers, DEX swaps, resource optimization.",
-  "url": "https://merx.exchange",
-  "repository": "https://github.com/Hovsteder/merx-mcp",
-  "transport": ["stdio", "sse"],
+  "displayName": "MERX - TRON Resource Exchange",
+  "description": "The complete TRON infrastructure layer for AI agents. Aggregates all energy and bandwidth providers, routes orders to cheapest source. Resource-aware transactions, SunSwap DEX swaps, x402 pay-per-use, standing orders, delegation monitors.",
+  "homepage": "https://merx.exchange",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hovsteder/merx-mcp"
+  },
+  "license": "MIT",
+  "runtime": "node",
+  "mcpServers": {
+    "merx-mcp": {
+      "command": "npx",
+      "args": ["merx-mcp"],
+      "env": {
+        "MERX_API_KEY": {
+          "description": "API key from merx.exchange (optional for read-only tools)",
+          "required": false
+        },
+        "TRON_PRIVATE_KEY": {
+          "description": "TRON private key for signing transactions (optional)",
+          "required": false
+        }
+      }
+    }
+  },
+  "remoteServers": [
+    {
+      "type": "sse",
+      "url": "https://merx.exchange/mcp/sse"
+    }
+  ],
+  "categories": ["blockchain", "finance", "agent-orchestration"],
+  "tags": ["tron", "energy", "bandwidth", "usdt", "defi", "sunswap", "x402"],
   "tools": 52,
   "prompts": 30,
-  "resources": 21
+  "resources": 21,
+  "author": {
+    "name": "MERX",
+    "url": "https://merx.exchange"
+  }
 }
