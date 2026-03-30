@@ -58,7 +58,7 @@ Three ways to use MERX:
   history, and monitor delegations.
 
 - **REST API + SDKs** -- integrate TRON resource management into any application
-  with JavaScript, Python, or raw HTTP. 33 endpoints covering prices, orders,
+  with JavaScript, Python, or raw HTTP. 46 endpoints covering prices, orders,
   balance, deposits, withdrawals, webhooks, and API key management.
 
 - **MCP server** -- give AI agents full TRON access through 52 tools, 30 prompts,
@@ -103,7 +103,7 @@ MERX solves this by aggregating all connected providers behind one API.
 | Component | Description |
 |---|---|
 | Web exchange | Trade energy and bandwidth at [merx.exchange](https://merx.exchange). Dashboard with real-time prices, order management, balance, and history. |
-| REST API | 33 endpoints covering prices, orders, balance, deposits, withdrawals, webhooks, and API keys. Versioned at `/api/v1/`. |
+| REST API | 46 endpoints covering prices, orders, balance, deposits, withdrawals, webhooks, and API keys. Versioned at `/api/v1/`. |
 | WebSocket | Real-time price stream at `wss://merx.exchange/ws`. Subscribe to specific providers or all. Heartbeat every 30 seconds. |
 | Webhooks | Events: `order.filled`, `order.failed`, `deposit.received`, `withdrawal.completed`. HMAC-SHA256 signed. Auto-retry on failure. |
 | JavaScript SDK | `@merx/sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
@@ -131,7 +131,7 @@ Install the JavaScript SDK:
 npm install @merx/sdk
 ```
 
-Use it in your application:
+Use it in your application (replace `merx_sk_your_key` with your API key from [merx.exchange](https://merx.exchange)):
 
 ```typescript
 import { MerxClient } from '@merx/sdk'
@@ -1170,7 +1170,7 @@ Factual comparison based on publicly available information.
 | MCP Tools | 52 | ~20 | ~10 | 27 | 27 |
 | MCP Prompts | 30 | 0 | 0 | 0 | 0 |
 | MCP Resources | 21 | 0 | 0 | 0 | 0 |
-| REST API | 33 endpoints | No | No | No | No |
+| REST API | 46 endpoints | No | No | No | No |
 | JavaScript SDK | Yes | No | No | No | No |
 | Python SDK | Yes | No | No | No | No |
 | WebSocket | Yes | No | No | No | No |
