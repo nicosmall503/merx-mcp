@@ -1,0 +1,19 @@
+{
+  "name": "merx-mcp",
+  "display_name": "MERX - TRON Resource Exchange",
+  "description": "The complete TRON infrastructure layer for AI agents. 52 tools for energy trading, token transfers, DEX swaps, and resource optimization across all TRON energy providers.",
+  "repository": "https://github.com/Hovsteder/merx-mcp",
+  "homepage": "https://merx.exchange",
+  "license": "MIT",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://merx.exchange/mcp/sse"
+    }
+  ],
+  "tools": 52,
+  "prompts": 30,
+  "resources": 21,
+  "categories": ["blockchain", "defi", "trading", "infrastructure"],
+  "tags": ["tron", "energy", "bandwidth", "usdt", "sunswap", "x402", "mcp"]
+}

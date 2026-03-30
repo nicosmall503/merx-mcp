@@ -1,0 +1,10 @@
+{
+  "name": "merx-mcp",
+  "description": "TRON resource exchange - 52 tools for AI agents. Energy trading, token transfers, DEX swaps, resource optimization.",
+  "url": "https://merx.exchange",
+  "repository": "https://github.com/Hovsteder/merx-mcp",
+  "transport": ["stdio", "sse"],
+  "tools": 52,
+  "prompts": 30,
+  "resources": 21
+}
