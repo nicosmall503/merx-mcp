@@ -1,4 +1,5 @@
 # MERX
+### https://MERX.exchange
 
 **The first TRON resource exchange.**
 
@@ -10,7 +11,7 @@
 
 One platform. Every energy and bandwidth provider. Best price automatically.
 
-[merx.exchange](https://merx.exchange) | [Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api-reference) | [MCP Server](#mcp-server)
+[Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api-reference) | [MCP Server](#mcp-server)
 
 ---
 
