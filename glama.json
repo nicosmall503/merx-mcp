@@ -1,5 +1,6 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["Hovsteder"],
   "name": "merx-mcp",
   "displayName": "MERX - TRON Resource Exchange",
   "description": "The complete TRON infrastructure layer for AI agents. Aggregates all energy and bandwidth providers, routes orders to cheapest source. Resource-aware transactions, SunSwap DEX swaps, x402 pay-per-use, standing orders, delegation monitors.",
