@@ -13,7 +13,7 @@
 
 One platform. Every energy and bandwidth provider. Best price automatically.
 
-[Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api-reference) | [MCP Server](#mcp-server)
+[Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api) | [MCP Server](#mcp-server)
 
 ---
 
@@ -523,7 +523,7 @@ Idempotency-Key header supported on `POST /orders` and `POST /withdraw`.
 | POST | `/x402/invoice` | Create payment invoice |
 | POST | `/x402/verify` | Verify invoice payment |
 
-Full API reference: [merx.exchange/docs/api-reference](https://merx.exchange/docs/api-reference)
+Full API reference: [merx.exchange/docs/api](https://merx.exchange/docs/api)
 
 ---
 
@@ -1203,7 +1203,7 @@ operations. Other servers focus on one area.
 |---|---|
 | Platform | [merx.exchange](https://merx.exchange) |
 | Documentation | [merx.exchange/docs](https://merx.exchange/docs) |
-| API Reference | [merx.exchange/docs/api-reference](https://merx.exchange/docs/api-reference) |
+| API Reference | [merx.exchange/docs/api](https://merx.exchange/docs/api) |
 | MCP Tools | [docs/TOOLS.md](docs/TOOLS.md) |
 | MCP Prompts | [docs/PROMPTS.md](docs/PROMPTS.md) |
 | MCP Resources | [docs/RESOURCES.md](docs/RESOURCES.md) |

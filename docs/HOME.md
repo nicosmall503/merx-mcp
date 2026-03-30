@@ -25,7 +25,7 @@ burn TRX unnecessarily.
 ## Quick links
 
 - **Website:** [merx.exchange](https://merx.exchange)
-- **API docs:** [merx.exchange/docs/api-reference](https://merx.exchange/docs/api-reference)
+- **API docs:** [merx.exchange/docs/api](https://merx.exchange/docs/api)
 - **MCP endpoint (SSE):** `https://merx.exchange/mcp/sse`
 - **npm:** `npm install -g merx`
 - **Source:** [github.com/merx-exchange/merx](https://github.com/merx-exchange/merx)
