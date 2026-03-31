@@ -1,19 +1,41 @@
 {
-  "name": "merx-mcp",
-  "display_name": "MERX - TRON Resource Exchange",
-  "description": "The complete TRON infrastructure layer for AI agents. 52 tools for energy trading, token transfers, DEX swaps, and resource optimization across all TRON energy providers.",
-  "repository": "https://github.com/Hovsteder/merx-mcp",
-  "homepage": "https://merx.exchange",
-  "license": "MIT",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "exchange.merx/mcp",
+  "title": "MERX - TRON Resource Exchange",
+  "description": "TRON resource exchange for AI agents. 52 tools, 30 prompts, 21 resources.",
+  "repository": {
+    "url": "https://github.com/Hovsteder/merx-mcp",
+    "source": "github"
+  },
+  "version": "1.0.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "merx-mcp",
+      "version": "1.0.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "MERX_API_KEY",
+          "description": "API key from merx.exchange. Unlocks trading, balance, standing orders, and monitors.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "TRON_PRIVATE_KEY",
+          "description": "TRON wallet private key for signing transactions. Never sent to any server. Enables transfers, swaps, and contract calls.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://merx.exchange/mcp/sse"
     }
-  ],
-  "tools": 52,
-  "prompts": 30,
-  "resources": 21,
-  "categories": ["blockchain", "defi", "trading", "infrastructure"],
-  "tags": ["tron", "energy", "bandwidth", "usdt", "sunswap", "x402", "mcp"]
+  ]
 }

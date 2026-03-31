@@ -1,17 +1,33 @@
 {
   "name": "merx-mcp",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "The complete TRON infrastructure layer for AI agents. 52 tools, 30 prompts, 21 resources.",
   "bin": {
     "merx-mcp": "./node_modules/merx-mcp/dist/index.js"
   },
   "dependencies": {
-    "merx-mcp": "^1.0.0"
+    "merx-mcp": "^1.0.2"
   },
   "license": "MIT",
   "homepage": "https://merx.exchange",
   "repository": {
     "type": "git",
     "url": "https://github.com/Hovsteder/merx-mcp"
-  }
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "tron",
+    "blockchain",
+    "energy",
+    "bandwidth",
+    "usdt",
+    "trx",
+    "ai-agents",
+    "claude",
+    "cursor",
+    "llm",
+    "web3"
+  ]
 }

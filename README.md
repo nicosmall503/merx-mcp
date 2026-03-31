@@ -108,7 +108,7 @@ MERX solves this by aggregating all connected providers behind one API.
 | REST API | 46 endpoints covering prices, orders, balance, deposits, withdrawals, webhooks, and API keys. Versioned at `/api/v1/`. |
 | WebSocket | Real-time price stream at `wss://merx.exchange/ws`. Subscribe to specific providers or all. Heartbeat every 30 seconds. |
 | Webhooks | Events: `order.filled`, `order.failed`, `deposit.received`, `withdrawal.completed`. HMAC-SHA256 signed. Auto-retry on failure. |
-| JavaScript SDK | `@merx/sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
+| JavaScript SDK | `merx-sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
 | Python SDK | `merx-sdk` -- same 4 modules in snake_case. Zero dependencies. Python 3.11+. |
 | MCP server | 52 tools, 30 prompts, 21 resources for AI agents. Hosted SSE (zero install) or local stdio. |
 | Documentation | 36 pages at [merx.exchange/docs](https://merx.exchange/docs). API reference, guides, examples. |
@@ -130,13 +130,13 @@ and bandwidth at the best available price. No code required.
 Install the JavaScript SDK:
 
 ```bash
-npm install @merx/sdk
+npm install merx-sdk
 ```
 
 Use it in your application (replace `merx_sk_your_key` with your API key from [merx.exchange](https://merx.exchange)):
 
 ```typescript
-import { MerxClient } from '@merx/sdk'
+import { MerxClient } from 'merx-sdk'
 
 const merx = new MerxClient({ apiKey: 'merx_sk_your_key' })
 
@@ -233,7 +233,7 @@ npm install -g merx
 {
   "mcpServers": {
     "merx": {
-      "command": "npx merx",
+      "command": "npx merx-mcp",
       "env": {
         "MERX_API_KEY": "merx_sk_your_key",
         "TRON_PRIVATE_KEY": "your_private_key"
@@ -776,11 +776,11 @@ All 52 tools with auth requirements. For input schemas and output examples, see
 ### JavaScript / TypeScript
 
 ```bash
-npm install @merx/sdk
+npm install merx-sdk
 ```
 
 ```typescript
-import { MerxClient } from '@merx/sdk'
+import { MerxClient } from 'merx-sdk'
 
 const merx = new MerxClient({ apiKey: 'merx_sk_your_key' })
 
@@ -795,7 +795,7 @@ const webhooks = await merx.webhooks.list()
 
 | Property | Value |
 |---|---|
-| Package | `@merx/sdk` |
+| Package | `merx-sdk` |
 | Modules | `prices`, `orders`, `balance`, `webhooks` |
 | Methods | 16 |
 | TypeScript | Full type definitions included |
