@@ -8,7 +8,7 @@
 [![smithery badge](https://smithery.ai/badge/powersun/merx)](https://smithery.ai/servers/powersun/merx)
 [![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Tools](https://img.shields.io/badge/tools-52-blue)
+![Tools](https://img.shields.io/badge/tools-53-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)
 ![Resources](https://img.shields.io/badge/resources-21-purple)
 
@@ -64,7 +64,7 @@ Three ways to use MERX:
   with JavaScript, Python, or raw HTTP. 46 endpoints covering prices, orders,
   balance, deposits, withdrawals, webhooks, and API key management.
 
-- **MCP server** -- give AI agents full TRON access through 52 tools, 30 prompts,
+- **MCP server** -- give AI agents full TRON access through 53 tools, 30 prompts,
   and 21 resources. Works with Claude, GPT, Cursor, and any MCP-compatible client.
   Zero install via hosted SSE, or run locally via stdio.
 
@@ -111,7 +111,7 @@ MERX solves this by aggregating all connected providers behind one API.
 | Webhooks | Events: `order.filled`, `order.failed`, `deposit.received`, `withdrawal.completed`. HMAC-SHA256 signed. Auto-retry on failure. |
 | JavaScript SDK | `merx-sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
 | Python SDK | `merx-sdk` -- same 4 modules in snake_case. Zero dependencies. Python 3.11+. |
-| MCP server | 52 tools, 30 prompts, 21 resources for AI agents. Hosted SSE (zero install) or local stdio. |
+| MCP server | 53 tools, 30 prompts, 21 resources for AI agents. Hosted SSE (zero install) or local stdio. |
 | Documentation | 36 pages at [merx.exchange/docs](https://merx.exchange/docs). API reference, guides, examples. |
 | Price widget | Embeddable widget for external sites showing live energy and bandwidth prices. |
 
@@ -220,7 +220,7 @@ To unlock write tools (send TRX, swap tokens), call `set_private_key`:
 
 ```
 set_private_key("your_64_char_hex_key")
--> Address derived automatically. All 52 tools available.
+-> Address derived automatically. All 53 tools available.
 -> Key never leaves your machine.
 ```
 
@@ -244,7 +244,7 @@ npm install -g merx
 }
 ```
 
-All 52 tools available from the first message.
+All 53 tools available from the first message.
 
 ### Access levels
 
@@ -530,7 +530,7 @@ Full API reference: [merx.exchange/docs/api](https://merx.exchange/docs/api)
 
 ## MCP server
 
-MERX provides a full MCP (Model Context Protocol) server for AI agents. 52 tools
+MERX provides a full MCP (Model Context Protocol) server for AI agents. 53 tools
 across 15 categories, 30 pre-built prompts, and 21 live data resources.
 
 ### Tool categories
@@ -640,7 +640,7 @@ Agent: [calls analyze_prices] Energy is at 22 SUN -- the 1st percentile
 
 ### Full tool reference
 
-All 52 tools with auth requirements. For input schemas and output examples, see
+All 53 tools with auth requirements. For input schemas and output examples, see
 [docs/TOOLS.md](docs/TOOLS.md).
 
 **Price Intelligence**

@@ -2,17 +2,17 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "exchange.merx/mcp",
   "title": "MERX - TRON Resource Exchange",
-  "description": "TRON resource exchange for AI agents. 52 tools, 30 prompts, 21 resources.",
+  "description": "TRON resource exchange for AI agents. 53 tools, 30 prompts, 21 resources.",
   "repository": {
     "url": "https://github.com/Hovsteder/merx-mcp",
     "source": "github"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "merx-mcp",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "transport": {
         "type": "stdio"
       },

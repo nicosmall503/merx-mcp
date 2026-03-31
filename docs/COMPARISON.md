@@ -93,7 +93,7 @@ broadcast, and verify. Other tools handle individual steps but leave the agent t
 orchestrate the flow.
 
 **Progressive access.** merx starts with 22 tools at zero configuration and scales
-to 52 tools as credentials are added. Other MCP servers require API keys before
+to 53 tools as credentials are added. Other MCP servers require API keys before
 any functionality is available.
 
 **Hosted SSE.** merx is the only TRON MCP server offering a hosted SSE endpoint,

@@ -34,7 +34,7 @@ burn TRX unnecessarily.
 
 ## Stats
 
-- 52 tools | 30 prompts | 21 resources
+- 53 tools | 30 prompts | 21 resources
 - 7 energy providers aggregated
 - 2 transport modes (stdio + SSE)
 - 3 payment methods

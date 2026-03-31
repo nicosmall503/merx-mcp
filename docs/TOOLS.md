@@ -1,6 +1,6 @@
 # Merx MCP Server -- Tool Reference
 
-Complete reference for all 52 tools exposed by the Merx MCP server.
+Complete reference for all 53 tools exposed by the Merx MCP server.
 Tools are grouped into 15 categories. Each entry shows the tool name, authentication
 requirements, input parameters, and a brief usage example.
 
