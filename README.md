@@ -5,6 +5,7 @@
 
 <a href="https://glama.ai/mcp/servers/Hovsteder/merx-mcp"><img width="380" height="200" src="https://glama.ai/mcp/servers/Hovsteder/merx-mcp/badge" alt="MERX MCP server" /></a>
 
+[![smithery badge](https://smithery.ai/badge/powersun/merx)](https://smithery.ai/servers/powersun/merx)
 [![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Tools](https://img.shields.io/badge/tools-52-blue)
