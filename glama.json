@@ -3,7 +3,7 @@
   "maintainers": ["Hovsteder"],
   "name": "merx-mcp",
   "displayName": "MERX - TRON Resource Exchange",
-  "description": "The complete TRON infrastructure layer for AI agents. Aggregates all energy and bandwidth providers, routes orders to cheapest source. Resource-aware transactions, SunSwap DEX swaps, x402 pay-per-use, standing orders, delegation monitors.",
+  "description": "The complete TRON infrastructure layer for AI agents. Supports MCP (53 tools), A2A (Google), and ACP (BeeAI). Aggregates all energy and bandwidth providers, routes orders to cheapest source. Resource-aware transactions, SunSwap DEX swaps, x402 pay-per-use, standing orders.",
   "homepage": "https://merx.exchange",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
     }
   ],
   "categories": ["blockchain", "finance", "agent-orchestration"],
-  "tags": ["tron", "energy", "bandwidth", "usdt", "defi", "sunswap", "x402"],
+  "tags": ["tron", "energy", "bandwidth", "usdt", "defi", "sunswap", "x402", "a2a", "acp", "multi-protocol"],
   "tools": 52,
   "prompts": 30,
   "resources": 21,
