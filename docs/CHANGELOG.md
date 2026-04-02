@@ -7,6 +7,21 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.0.4] - 2026-04-02
+
+### Added
+
+- A2A protocol support (Google Agent-to-Agent): 6 skills, SSE streaming, task
+  state history. Agent Card at `/.well-known/agent.json`.
+- ACP protocol support (BeeAI): 6 capabilities, run-based execution. Manifest
+  at `/.well-known/agent-manifest.json`.
+- withdraw tool (53rd tool).
+- Listed on awesome-a2a (Financial Services) and a2aregistry.in.
+- Additional Protocol Support section in README.
+- Keywords: a2a, acp, agent-to-agent, beeai added to package.json.
+
+---
+
 ## [1.0.0] - 2026-03-30
 
 Initial public release.

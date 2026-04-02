@@ -27,15 +27,19 @@ burn TRX unnecessarily.
 - **Website:** [merx.exchange](https://merx.exchange)
 - **API docs:** [merx.exchange/docs/api](https://merx.exchange/docs/api)
 - **MCP endpoint (SSE):** `https://merx.exchange/mcp/sse`
-- **npm:** `npm install -g merx`
-- **Source:** [github.com/merx-exchange/merx](https://github.com/merx-exchange/merx)
+- **npm:** `npm install -g merx-mcp`
+- **Source:** [github.com/Hovsteder/merx-mcp](https://github.com/Hovsteder/merx-mcp)
+- **Agent Protocols:** [merx.exchange/agents](https://merx.exchange/agents)
 
 ---
 
 ## Stats
 
-- 53 tools | 30 prompts | 21 resources
+- 53 MCP tools | 30 prompts | 21 resources
+- 6 A2A skills (Google Agent-to-Agent Protocol)
+- 6 ACP capabilities (BeeAI Agent Communication Protocol)
 - 7 energy providers aggregated
-- 2 transport modes (stdio + SSE)
+- 2 MCP transport modes (stdio + SSE)
 - 3 payment methods
 - 8 on-chain transaction types verified on TRON mainnet
+- Listed on: Glama, Smithery, MCP Registry, awesome-a2a, a2aregistry.in

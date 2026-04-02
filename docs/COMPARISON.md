@@ -9,9 +9,11 @@ blockchain access to AI agents.
 
 | Feature | merx | Sun Protocol | Netts MCP | TronLink MCP | PowerSun MCP |
 |---|---|---|---|---|---|
-| MCP tools | 52 | 0 | 8 | 12 | 6 |
+| MCP tools | 53 | 0 | 8 | 12 | 6 |
 | MCP prompts | 30 | 0 | 0 | 0 | 0 |
 | MCP resources | 21 | 0 | 0 | 0 | 0 |
+| A2A skills (Google) | 6 | 0 | 0 | 0 | 0 |
+| ACP capabilities (BeeAI) | 6 | 0 | 0 | 0 | 0 |
 | Transport modes | stdio + SSE | N/A | stdio | stdio | stdio |
 | Energy providers | 7 | 1 (self) | 1 (Netts) | 0 | 1 (PowerSun) |
 | Multi-provider routing | Yes | No | No | No | No |
