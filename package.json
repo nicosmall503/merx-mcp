@@ -2,17 +2,19 @@
   "name": "merx-mcp",
   "version": "1.0.4",
   "description": "The complete TRON infrastructure layer for AI agents. 52 tools, 30 prompts, 21 resources.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./handler": "./dist/handler.js"
+  },
   "bin": {
-    "merx-mcp": "./node_modules/merx-mcp/dist/index.js"
+    "merx-mcp": "./dist/index.js"
   },
-  "dependencies": {
-    "merx-mcp": "^1.0.4"
-  },
-  "license": "MIT",
-  "homepage": "https://merx.exchange",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Hovsteder/merx-mcp"
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
   },
   "keywords": [
     "mcp",
@@ -24,10 +26,27 @@
     "bandwidth",
     "usdt",
     "trx",
+    "ai-agent",
     "ai-agents",
     "claude",
     "cursor",
     "llm",
     "web3"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hovsteder/merx-mcp"
+  },
+  "homepage": "https://merx.exchange/docs/tools/mcp-server",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "tronweb": "^6.0.0"
+  }
 }
