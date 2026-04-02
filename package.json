@@ -1,7 +1,7 @@
 {
   "name": "merx-mcp",
   "version": "1.0.4",
-  "description": "The complete TRON infrastructure layer for AI agents. 54 tools, 30 prompts, 21 resources.",
+  "description": "The complete TRON infrastructure layer for AI agents. 55 tools, 30 prompts, 21 resources.",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {

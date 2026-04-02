@@ -10,7 +10,7 @@ requests flow, how resources are managed, and how the major subsystems interact.
 ```mermaid
 graph TB
     Agent[AI Agent<br>Claude / GPT / Cursor]
-    MCP[merx MCP Server<br>54 tools / 30 prompts / 21 resources]
+    MCP[merx MCP Server<br>55 tools / 30 prompts / 21 resources]
     API[Merx API<br>merx.exchange/api/v1]
     TG[TronGrid<br>TRON RPC]
     Providers[7 Energy Providers<br>CatFee, ITRX, PowerSun,<br>Feee, TronSave, TEM, Netts]
@@ -32,7 +32,7 @@ AI Agent (Claude / GPT / Cursor)
     |
     | MCP Protocol (stdio or SSE)
     v
-merx MCP Server (54 tools)
+merx MCP Server (55 tools)
     |
     | HTTPS
     v
@@ -423,7 +423,7 @@ The server operates at three tiers based on available credentials:
 |---|---|---|
 | Anonymous | None | 22 read-only tools: prices, estimation, market analysis, on-chain queries |
 | Authenticated | API key | 40 tools: + orders, balance, standing orders, monitors, account management |
-| Full access | API key + private key | 54 tools: + transfers, swaps, approvals, contract execution, intents, x402 |
+| Full access | API key + private key | 55 tools: + transfers, swaps, approvals, contract execution, intents, x402 |
 
 This design allows agents to start with zero configuration and progressively unlock
 capabilities as needed.

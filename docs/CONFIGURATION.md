@@ -133,7 +133,7 @@ Everything in Tier 1, plus:
 - **Simulation:** `simulate`
 - **Payments:** `enable_auto_deposit`
 
-### Tier 3: API key + private key (54 tools)
+### Tier 3: API key + private key (55 tools)
 
 Unlocked by additionally setting `TRON_PRIVATE_KEY` or calling `set_private_key`.
 
@@ -168,7 +168,7 @@ persisted to disk or sent to external services beyond the Merx API.
 ```
 Agent: set_private_key("a]1b2c3d4e5f6...64_hex_chars")
 -> Private key set. Address derived: THT49kLJ...
--> 54 tools now available.
+-> 55 tools now available.
 ```
 
 The private key is used only for local transaction signing within the MCP process.
@@ -190,7 +190,7 @@ The tool requires a higher authentication tier. Check which tier you are on:
 
 - 22 tools visible: no credentials set. Call `set_api_key` to unlock trading tools.
 - 40 tools visible: API key set but no private key. Call `set_private_key` for write tools.
-- 54 tools visible: full access.
+- 55 tools visible: full access.
 
 ### "Invalid API key"
 
