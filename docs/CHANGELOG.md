@@ -16,6 +16,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - ACP protocol support (BeeAI): 6 capabilities, run-based execution. Manifest
   at `/.well-known/agent-manifest.json`.
 - withdraw tool (53rd tool).
+- compile_policy tool (54th tool) -- natural language to standing orders via Anthropic API.
 - Listed on awesome-a2a (Financial Services) and a2aregistry.in.
 - Additional Protocol Support section in README.
 - Keywords: a2a, acp, agent-to-agent, beeai added to package.json.

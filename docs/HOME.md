@@ -35,9 +35,9 @@ burn TRX unnecessarily.
 
 ## Stats
 
-- 53 MCP tools | 30 prompts | 21 resources
-- 6 A2A skills (Google Agent-to-Agent Protocol)
-- 6 ACP capabilities (BeeAI Agent Communication Protocol)
+- 54 MCP tools | 30 prompts | 21 resources
+- 7 A2A skills (Google Agent-to-Agent Protocol)
+- 7 ACP capabilities (BeeAI Agent Communication Protocol)
 - 7 energy providers aggregated
 - 2 MCP transport modes (stdio + SSE)
 - 3 payment methods
