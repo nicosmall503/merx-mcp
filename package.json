@@ -31,7 +31,11 @@
     "claude",
     "cursor",
     "llm",
-    "web3"
+    "web3",
+    "a2a",
+    "acp",
+    "agent-to-agent",
+    "beeai"
   ],
   "repository": {
     "type": "git",

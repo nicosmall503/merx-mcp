@@ -246,6 +246,13 @@ npm install -g merx
 
 All 53 tools available from the first message.
 
+## Additional Protocol Support
+
+MERX also supports A2A and ACP for non-MCP orchestrators:
+
+- **A2A** (LangChain, CrewAI, Vertex AI, AutoGen): `https://merx.exchange/.well-known/agent.json`
+- **ACP** (BeeAI): `https://merx.exchange/.well-known/agent-manifest.json`
+
 ### Access levels
 
 | Configuration | Tools | Capabilities |
