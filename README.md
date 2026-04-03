@@ -8,7 +8,7 @@
 [![smithery badge](https://smithery.ai/badge/powersun/merx)](https://smithery.ai/servers/powersun/merx)
 [![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Tools](https://img.shields.io/badge/tools-53-blue)
+![Tools](https://img.shields.io/badge/tools-55-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)
 ![Resources](https://img.shields.io/badge/resources-21-purple)
 
@@ -259,7 +259,7 @@ MERX also supports A2A and ACP for non-MCP orchestrators:
 |---|---|---|
 | No keys | 22 | Prices, estimation, market analysis, on-chain queries, address lookups |
 | + `MERX_API_KEY` | 34 | + Orders, balance, deposits, standing orders, monitors |
-| + `TRON_PRIVATE_KEY` | 52 | + Send TRX/USDT, swap tokens, approve contracts, execute intents |
+| + `TRON_PRIVATE_KEY` | 55 | + Send TRX/USDT, swap tokens, approve contracts, execute intents |
 
 ---
 
@@ -314,7 +314,7 @@ and receive energy delegation. Complete flow in one API call. Tested on mainnet:
 
 ### Full MCP protocol
 
-The only TRON MCP server using all three MCP primitives: tools (52), prompts (30),
+The only TRON MCP server using all three MCP primitives: tools (55), prompts (30),
 and resources (21 -- 14 static + 7 templates). Two transport modes: hosted SSE
 (zero install) and local stdio (full key management).
 
@@ -775,7 +775,7 @@ All 55 tools with auth requirements. For input schemas and output examples, see
 | # | Tool | Description | Auth |
 |---|---|---|---|
 | 51 | `set_api_key` | Set MERX API key for this session | -- |
-| 52 | `set_private_key` | Set TRON private key for this session (address auto-derived) | -- |
+| 55 | `set_private_key` | Set TRON private key for this session (address auto-derived) | -- |
 
 ---
 
@@ -1177,7 +1177,7 @@ Factual comparison based on publicly available information.
 
 | Feature | MERX | Sun Protocol | Netts MCP | TronLink MCP | PowerSun MCP |
 |---|---|---|---|---|---|
-| MCP Tools | 52 | ~20 | ~10 | 27 | 27 |
+| MCP Tools | 55 | ~20 | ~10 | 27 | 27 |
 | MCP Prompts | 30 | 0 | 0 | 0 | 0 |
 | MCP Resources | 21 | 0 | 0 | 0 | 0 |
 | REST API | 46 endpoints | No | No | No | No |
