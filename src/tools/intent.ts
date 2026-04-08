@@ -130,8 +130,7 @@ async function runSimulation(input: Record<string, unknown>): Promise<string> {
 const executeIntent: McpTool = {
   name: 'execute_intent',
   description:
-    'Execute a multi-step operation (transfer, swap, buy resources, etc). ' +
-    'Validates and simulates all steps with resource cost estimates. Auth required.',
+    'Plan a multi-step operation (transfer, swap, buy resources, etc) and return a cost estimate, total energy/bandwidth needed, and the cheapest resource acquisition strategy. NOTE: actual on-chain execution of multi-step intents is not yet wired up — currently returns the same plan as simulate, regardless of dry_run. Use this for planning; for real execution call the underlying tools (create_order, transfer_trc20, execute_swap) yourself in sequence. Auth required.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -167,7 +166,7 @@ const executeIntent: McpTool = {
 const simulate: McpTool = {
   name: 'simulate',
   description:
-    'Simulate a multi-step operation without executing. Returns resource estimates and costs.',
+    'Dry-run a multi-step operation (transfer, swap, buy resources, etc) without sending anything on-chain. Returns per-step energy and bandwidth estimates plus a total TRX cost. Use this to preview a plan before committing — for example, before transferring USDT to multiple recipients you can simulate to see the total energy cost. No auth required.',
   inputSchema: {
     type: 'object',
     properties: {

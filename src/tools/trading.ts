@@ -68,7 +68,7 @@ const createOrder: McpTool = {
 
 const getOrder: McpTool = {
   name: 'get_order',
-  description: 'Get order details and fill status by ID. Auth required.',
+  description: 'Get order status by UUID. Aliases: get_order_status, check_order, order_status, order_details, fetch_order. Check the status and fill details of an existing order by its UUID. Returns current status (PENDING/FILLING/FILLED/PARTIAL/FAILED/CANCELLED), fill amounts, provider used, on-chain delegation tx hash if delivered. Use this to poll order progress after creating an order. Auth required (API key).',
   inputSchema: {
     type: 'object',
     properties: {
@@ -167,9 +167,76 @@ const ensureResources: McpTool = {
   },
 }
 
+const TERMINAL_STATUSES = new Set(['FILLED', 'PARTIAL', 'FAILED', 'CANCELLED'])
+
+const waitForDelegation: McpTool = {
+  name: 'wait_for_delegation',
+  description:
+    'Block until an order reaches a terminal state (FILLED, PARTIAL, FAILED, or CANCELLED) by polling get_order at fixed intervals. Use this right after create_order when you need to confirm the energy/bandwidth has actually been delegated on-chain before sending the next transaction. Returns the final order details including the on-chain delegation tx hash. Auth required.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: {
+        type: 'string',
+        description: 'The order UUID returned by create_order.',
+      },
+      timeout_sec: {
+        type: 'number',
+        description: 'Maximum time to wait in seconds (default: 60, max: 300).',
+      },
+      poll_interval_sec: {
+        type: 'number',
+        description: 'How often to check status in seconds (default: 3, min: 1).',
+      },
+    },
+    required: ['order_id'],
+  },
+  async handler(input) {
+    try {
+      requireAuth()
+      const orderId = input.order_id as string
+      const timeoutSec = Math.min(Math.max(Number(input.timeout_sec ?? 60), 1), 300)
+      const pollSec = Math.max(Number(input.poll_interval_sec ?? 3), 1)
+      const deadline = Date.now() + timeoutSec * 1000
+
+      let lastOrder: Order | null = null
+      let polls = 0
+      while (Date.now() < deadline) {
+        polls++
+        try {
+          lastOrder = await authGet(`/api/v1/orders/${orderId}`) as Order
+        } catch (e) {
+          return errorResult(`Failed to fetch order ${orderId}: ${(e as Error).message}`)
+        }
+        const status = String((lastOrder as { status?: string }).status ?? 'UNKNOWN')
+        if (TERMINAL_STATUSES.has(status)) {
+          return textResult(
+            `Order ${orderId} reached terminal state after ${polls} polls (${Math.round((Date.now() - (deadline - timeoutSec * 1000)) / 1000)}s):\n\n` +
+            formatOrderDetail(lastOrder)
+          )
+        }
+        // Sleep until next poll, but never past the deadline
+        const remainingMs = deadline - Date.now()
+        if (remainingMs <= 0) break
+        await new Promise(r => setTimeout(r, Math.min(pollSec * 1000, remainingMs)))
+      }
+
+      const finalStatus = lastOrder ? String((lastOrder as { status?: string }).status ?? 'UNKNOWN') : 'NEVER_FETCHED'
+      return errorResult(
+        `Timeout after ${timeoutSec}s: order ${orderId} did not reach a terminal state. ` +
+        `Last observed status: ${finalStatus}. Polls made: ${polls}. ` +
+        `You can call get_order(${orderId}) later to check progress, or call wait_for_delegation again with a longer timeout.`
+      )
+    } catch (e) {
+      return errorResult((e as Error).message)
+    }
+  },
+}
+
 export const tradingTools: McpTool[] = [
   createOrder,
   getOrder,
   listOrders,
   ensureResources,
+  waitForDelegation,
 ]

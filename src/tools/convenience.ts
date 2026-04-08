@@ -12,22 +12,29 @@ import type { McpTool } from '../types.js'
 
 const explainConceptTool: McpTool = {
   name: 'explain_concept',
-  description: 'Explain a TRON or Merx concept. No authentication required.',
+  description:
+    'Explain a TRON or Merx concept in plain language. Hardcoded topics (exact match): energy, bandwidth, staking, delegation, sun_units, burn_vs_rent, merx_routing, provider_types. The lookup is fuzzy — substring matches also work, so "rent" finds "burn_vs_rent" and "providers" finds "provider_types". For topics outside this list (e.g. x402, stablecoins, gasfree), pick the closest hardcoded topic, or just answer the question yourself from the broader context — this tool only returns canned explanations of TRON resource economics.',
   inputSchema: {
     type: 'object',
     properties: {
       topic: {
         type: 'string',
-        description: 'Topic: energy, bandwidth, staking, delegation, sun_units, burn_vs_rent, merx_routing, provider_types',
+        description: 'Topic to explain. Exact: energy, bandwidth, staking, delegation, sun_units, burn_vs_rent, merx_routing, provider_types. Fuzzy substrings (e.g. "rent", "providers") also work.',
       },
     },
     required: ['topic'],
   },
   async handler(input) {
+    if (input.topic == null) {
+      return errorResult(`topic is required. Available topics: ${listTopics().join(', ')}`)
+    }
     const topic = String(input.topic).toLowerCase().replace(/[\s-]/g, '_')
     const text = getConcept(topic)
     if (!text) {
-      return textResult(`Unknown topic: "${input.topic}". Available: ${listTopics().join(', ')}`)
+      return textResult(
+        `No hardcoded explanation for "${input.topic}". Available topics: ${listTopics().join(', ')}. ` +
+        `For non-listed topics, pick the closest match or rely on broader context.`
+      )
     }
     return textResult(`${topic.replace(/_/g, ' ').toUpperCase()}\n\n${text}`)
   },
@@ -35,13 +42,18 @@ const explainConceptTool: McpTool = {
 
 // --- suggest_duration ---
 
+// Use cases map to a duration range (in seconds). The cheapest tier within the
+// range wins — so we deliberately pick wide ranges that include short flexible tiers
+// when they exist, since "I want to operate for 1 day" doesn't strictly require
+// a 1-day rental — it just means the rental must cover at least that period.
+// (Renting 30d for daily_operations is fine if 30d is cheaper per unit.)
 const USE_CASE_MAP: Record<string, { label: string; minSec: number; maxSec: number }> = {
-  single_transfer:   { label: 'Single transfer',   minSec: 0,       maxSec: 600 },
-  batch_transfers:   { label: 'Batch transfers',   minSec: 3600,    maxSec: 3600 },
-  dapp_session:      { label: 'dApp session',      minSec: 3600,    maxSec: 21600 },
-  daily_operations:  { label: 'Daily operations',  minSec: 86400,   maxSec: 86400 },
-  weekly_operations: { label: 'Weekly operations',  minSec: 604800,  maxSec: 604800 },
-  monthly_budget:    { label: 'Monthly budget',     minSec: 2592000, maxSec: 2592000 },
+  single_transfer:   { label: 'Single transfer',    minSec: 0,       maxSec: 3600 },     // anything up to 1h
+  batch_transfers:   { label: 'Batch transfers',    minSec: 0,       maxSec: 86400 },    // anything up to 1d
+  dapp_session:      { label: 'dApp session',       minSec: 0,       maxSec: 86400 },    // anything up to 1d
+  daily_operations:  { label: 'Daily operations',   minSec: 0,       maxSec: 2592000 },  // anything up to 30d (long is cheaper)
+  weekly_operations: { label: 'Weekly operations',  minSec: 604800,  maxSec: 2592000 },  // 7d to 30d
+  monthly_budget:    { label: 'Monthly budget',     minSec: 2592000, maxSec: 2592000 },  // exact 30d
 }
 
 function formatSuggestion(

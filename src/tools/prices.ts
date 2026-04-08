@@ -13,7 +13,7 @@ import type { ProviderPrice, PriceAnalysis, PriceHistoryEntry } from './price-fo
 
 const getPrices: McpTool = {
   name: 'get_prices',
-  description: 'Get current energy and bandwidth prices from all Merx providers. No auth required.',
+  description: 'Get current energy and bandwidth prices from all Merx providers, sorted by best (minimum) price across all duration tiers. Each provider lists ALL its duration tiers (5min/1h/1d/7d/30d etc) — short rentals are usually more expensive per unit than long ones, so always check tier-by-tier. Optionally filter by exact duration in seconds. No auth required.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -24,18 +24,29 @@ const getPrices: McpTool = {
       },
       duration: {
         type: 'number',
-        description: 'Filter by duration in seconds.',
+        description: 'Filter to providers offering this exact duration in seconds (e.g. 3600 for 1h, 86400 for 1d, 604800 for 7d, 2592000 for 30d). Omit to see all tiers.',
       },
     },
   },
   async handler(input) {
     try {
-      const qs = buildQueryString({
-        resource: input.resource as string | undefined,
-        duration: input.duration != null ? String(input.duration) : undefined,
-      })
-      const data = await publicGet(`/api/v1/prices${qs}`) as ProviderPrice[]
-      return textResult(formatPriceTable(data, input.resource as string | undefined))
+      const data = await publicGet('/api/v1/prices') as ProviderPrice[]
+      const resource = input.resource as string | undefined
+      const duration = input.duration != null ? Number(input.duration) : undefined
+
+      // Client-side duration filter: drop providers/tiers that don't offer the exact duration
+      let filtered = data
+      if (duration != null) {
+        filtered = data
+          .map(p => ({
+            ...p,
+            energy_prices: p.energy_prices.filter(pp => pp.duration_sec === duration),
+            bandwidth_prices: p.bandwidth_prices.filter(pp => pp.duration_sec === duration),
+          }))
+          .filter(p => p.energy_prices.length > 0 || p.bandwidth_prices.length > 0)
+      }
+
+      return textResult(formatPriceTable(filtered, resource))
     } catch (e) {
       return errorResult((e as Error).message)
     }
@@ -44,7 +55,7 @@ const getPrices: McpTool = {
 
 const getBestPrice: McpTool = {
   name: 'get_best_price',
-  description: 'Find the cheapest provider for a given resource and amount. No auth required.',
+  description: 'Quick lookup of the single cheapest provider for a resource type, with optional minimum amount filter. CAVEAT: this returns a single representative price per provider, not broken down by duration tier — short rentals (5min) and long rentals (30 days) have very different per-unit prices and this tool does not distinguish between them. For an accurate per-tier comparison, use get_prices(duration=N) where N is the exact rental duration in seconds (e.g. 3600 for 1h, 86400 for 1d, 2592000 for 30d). Use get_best_price only when you need the absolute floor price as a quick sanity-check. No auth required.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -90,7 +101,7 @@ const analyzePrices: McpTool = {
   async handler(input) {
     try {
       const qs = buildQueryString({ resource: input.resource as string | undefined })
-      const data = await publicGet(`/api/v1/prices/analysis${qs}`) as { energy: PriceAnalysis; bandwidth: PriceAnalysis }
+      const data = await publicGet(`/api/v1/prices/analysis${qs}`) as { energy?: PriceAnalysis; bandwidth?: PriceAnalysis }
       return textResult(formatAnalysis(data))
     } catch (e) {
       return errorResult((e as Error).message)

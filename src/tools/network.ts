@@ -113,10 +113,13 @@ const validateAddress: McpTool = {
       }
       const data = await publicGet(`/api/v1/chain/balance/${addr}`)
         .catch(() => null) as Record<string, unknown> | null
-      const balSun = Number(data?.balance ?? 0)
+      // Backend returns { balance_sun, balance_trx }, NOT { balance }
+      const balSun = Number(data?.balance_sun ?? data?.balance ?? 0)
       const status = data != null
-        ? `Active (balance ${sunToTrx(balSun)} TRX)`
-        : 'Not activated'
+        ? balSun > 0
+          ? `Active (balance ${sunToTrx(balSun)} TRX)`
+          : 'Address exists on-chain but has zero TRX balance'
+        : 'Not activated (address has never received TRX)'
       return textResult(
         `Address:  ${addr}\nFormat:   Valid TRON address\nOn-chain: ${status}`
       )

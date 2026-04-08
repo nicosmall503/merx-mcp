@@ -25,15 +25,38 @@ export interface Monitor {
   created_at: string
 }
 
+// Resolve which resource a standing order watches.
+// 1. trigger_params.resource — explicit, modern format
+// 2. action_params.resource_type — explicit, alternative location
+// 3. action_params.{energy_target,energy_minimum,...} — heuristic for legacy ensure_resources
+// 4. action_params.{bandwidth_target,bandwidth_minimum,...} — same for bandwidth
+// 5. fall back to ENERGY (the overwhelmingly common case on TRON)
+function resolveResource(order: StandingOrder): string {
+  const p = order.trigger_params
+  if (typeof p.resource === 'string') return p.resource
+  const ap = order.action_params ?? {}
+  if (typeof ap.resource_type === 'string') return ap.resource_type
+  const apKeys = Object.keys(ap).map(k => k.toLowerCase())
+  if (apKeys.some(k => k.startsWith('energy'))) return 'ENERGY'
+  if (apKeys.some(k => k.startsWith('bandwidth'))) return 'BANDWIDTH'
+  return 'ENERGY'
+}
+
 export function describeTrigger(order: StandingOrder): string {
   const p = order.trigger_params
-  const res = (p.resource as string) ?? ''
-  const threshold = p.threshold_sun ? sunToTrx(p.threshold_sun as number) : '?'
+  const res = resolveResource(order)
+  // For price triggers, threshold_sun is a per-unit price (e.g. 20 SUN per energy unit).
+  // It is NOT a TRX total — do not convert via sunToTrx (that would show 0.0000 TRX
+  // because per-unit prices are tiny in absolute SUN).
+  const priceThreshold = p.threshold_sun != null ? `${p.threshold_sun} SUN/unit` : '?'
+  // For balance triggers, the threshold IS a total amount, so TRX conversion makes sense.
+  const balanceThreshold = p.threshold_sun != null ? `${sunToTrx(p.threshold_sun as number)} TRX` : '?'
   switch (order.trigger_type) {
-    case 'price_below': return `${res} price < ${threshold} TRX`
-    case 'price_above': return `${res} price > ${threshold} TRX`
+    case 'price_below': return `${res} price < ${priceThreshold}`
+    case 'price_above': return `${res} price > ${priceThreshold}`
     case 'schedule': return `schedule: ${p.cron ?? p.interval ?? '?'}`
-    case 'balance_below': return `balance < ${threshold} TRX`
+    case 'balance_below': return `${res} balance < ${balanceThreshold}`
+    case 'provider_available': return `provider ${p.provider ?? '?'} available`
     default: return order.trigger_type
   }
 }
@@ -69,16 +92,17 @@ export function formatStandingOrderDetail(order: StandingOrder): string {
 
 export function formatStandingOrderTable(orders: StandingOrder[]): string {
   if (!orders.length) return 'No standing orders found.'
-  const header = 'ID | Trigger | Action | Budget (spent/total) | Executions | Status'
-  const sep = '-'.repeat(header.length)
+  // Full UUIDs — agents need them for cancel_standing_order / get_standing_order
   const rows = orders.map(o => {
     const budget = sunToTrx(o.budget_sun)
     const spent = sunToTrx(o.spent_sun ?? 0)
     const execs = `${o.executions ?? 0}/${o.max_executions}`
-    const id = o.id.slice(0, 8)
-    return `${id} | ${describeTrigger(o)} | ${describeAction(o)} | ${spent}/${budget} TRX | ${execs} | ${o.status}`
+    return `${o.id} | ${describeTrigger(o)} | ${describeAction(o)} | ${spent}/${budget} TRX | ${execs} | ${o.status}`
   })
-  return [header, sep, ...rows].join('\n')
+  const header = 'Standing Order ID (UUID) | Trigger | Action | Budget (spent/total) | Executions | Status'
+  const sep = '-------------------------|---------|--------|----------------------|------------|-------'
+  // Hint moved AFTER data so machine consumers can split on the blank line
+  return [header, sep, ...rows, '', `(Pass the full UUID to get_standing_order or cancel_standing_order to inspect or remove an order.)`].join('\n')
 }
 
 export function formatMonitorDetail(m: Monitor): string {
@@ -95,12 +119,21 @@ export function formatMonitorDetail(m: Monitor): string {
 
 export function formatMonitorTable(monitors: Monitor[]): string {
   if (!monitors.length) return 'No monitors found.'
-  const header = 'ID | Type | Target | Status'
-  const sep = '-'.repeat(header.length)
+  // Full UUIDs and full addresses — agents need them for cancel/inspect operations
+  const header = 'Monitor ID (UUID) | Type | Target | Status'
+  const sep = '------------------|------|--------|-------'
   const rows = monitors.map(m => {
-    const id = m.id.slice(0, 8)
-    const target = m.target_address?.slice(0, 12) ?? '-'
-    return `${id} | ${m.monitor_type} | ${target} | ${m.status}`
+    let target: string
+    if (m.target_address) {
+      target = m.target_address
+    } else if (m.monitor_type === 'price_alert') {
+      target = '(market-wide)'
+    } else if (m.monitor_type === 'balance_threshold') {
+      target = '(own account)'
+    } else {
+      target = '-'
+    }
+    return `${m.id} | ${m.monitor_type} | ${target} | ${m.status}`
   })
   return [header, sep, ...rows].join('\n')
 }

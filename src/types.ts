@@ -1,3 +1,11 @@
+export interface McpToolAnnotations {
+  title?: string
+  readOnlyHint?: boolean
+  destructiveHint?: boolean
+  idempotentHint?: boolean
+  openWorldHint?: boolean
+}
+
 export interface McpTool {
   name: string
   description: string
@@ -6,6 +14,7 @@ export interface McpTool {
     properties: Record<string, unknown>
     required?: string[]
   }
+  annotations?: McpToolAnnotations
   handler: (input: Record<string, unknown>) => Promise<McpToolResult>
 }
 

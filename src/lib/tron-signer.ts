@@ -2,6 +2,26 @@ import { TronWeb } from 'tronweb'
 
 const BASE_URL = process.env.MERX_BASE_URL ?? 'https://merx.exchange'
 
+// TRON node returns broadcast error messages as hex-encoded ASCII (e.g.
+// "56616c69646174652073..." → "Validate s..."). Decode for human display.
+function decodeTronError(msg: unknown): string | null {
+  if (msg == null) return null
+  const s = String(msg)
+  if (!/^[0-9a-fA-F]+$/.test(s) || s.length % 2 !== 0) return s
+  try {
+    let out = ''
+    for (let i = 0; i < s.length; i += 2) {
+      const c = parseInt(s.slice(i, i + 2), 16)
+      // Only printable ASCII — anything else aborts decode and we return raw
+      if (c < 32 || c > 126) return s
+      out += String.fromCharCode(c)
+    }
+    return out
+  } catch {
+    return s
+  }
+}
+
 function getTronWeb(): InstanceType<typeof TronWeb> {
   const pk = process.env.TRON_PRIVATE_KEY
   if (!pk) throw new Error('TRON_PRIVATE_KEY is required for signing')
@@ -26,7 +46,7 @@ export async function transferTrx(to: string, amountSun: number): Promise<TxResu
   const tx = await tw.transactionBuilder.sendTrx(to, amountSun, getAddress())
   const signed = await tw.trx.sign(tx)
   const result = await tw.trx.sendRawTransaction(signed)
-  return { txId: signed.txID, success: result.result === true, error: result.message ?? null }
+  return { txId: signed.txID, success: result.result === true, error: decodeTronError(result.message) }
 }
 
 export async function transferTrc20(
@@ -40,7 +60,7 @@ export async function transferTrc20(
   )
   const signed = await tw.trx.sign(transaction)
   const result = await tw.trx.sendRawTransaction(signed)
-  return { txId: signed.txID, success: result.result === true, error: result.message ?? null }
+  return { txId: signed.txID, success: result.result === true, error: decodeTronError(result.message) }
 }
 
 export async function approveTrc20(
@@ -54,7 +74,7 @@ export async function approveTrc20(
   )
   const signed = await tw.trx.sign(transaction)
   const result = await tw.trx.sendRawTransaction(signed)
-  return { txId: signed.txID, success: result.result === true, error: result.message ?? null }
+  return { txId: signed.txID, success: result.result === true, error: decodeTronError(result.message) }
 }
 
 export async function callContract(
@@ -70,7 +90,7 @@ export async function callContract(
   )
   const signed = await tw.trx.sign(transaction)
   const result = await tw.trx.sendRawTransaction(signed)
-  return { txId: signed.txID, success: result.result === true, error: result.message ?? null }
+  return { txId: signed.txID, success: result.result === true, error: decodeTronError(result.message) }
 }
 
 export async function depositTrx(amountSun: number): Promise<TxResult> {
@@ -95,7 +115,7 @@ export async function depositTrx(amountSun: number): Promise<TxResult> {
   const signed = await tw.trx.sign(tx)
   const result = await tw.trx.sendRawTransaction(signed)
   return {
-    txId: signed.txID, success: result.result === true, error: result.message ?? null,
+    txId: signed.txID, success: result.result === true, error: decodeTronError(result.message),
     depositAddress: data.address, memo: data.memo,
   }
 }
@@ -114,7 +134,7 @@ export async function transferTrxWithMemo(
   }
   const signed = await tw.trx.sign(tx)
   const result = await tw.trx.sendRawTransaction(signed)
-  return { txId: signed.txID, success: result.result === true, error: result.message ?? null }
+  return { txId: signed.txID, success: result.result === true, error: decodeTronError(result.message) }
 }
 
 export interface TxResult {

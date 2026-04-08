@@ -14,6 +14,10 @@ import { paymentTools }       from './tools/payments.js'
 import { intentTools }        from './tools/intent.js'
 import { standingOrderTools } from './tools/standing-orders.js'
 import { withdrawTools }      from './tools/withdraw.js'
+import { policyTools }        from './tools/compile-policy.js'
+import { broadcastTools }    from './tools/broadcast.js'
+import { agentPaymentTools } from './tools/agent-payments.js'
+import { TOOL_ANNOTATIONS }   from './tools/annotations.js'
 import { ALL_PROMPTS }        from './prompts/index.js'
 import { STATIC_RESOURCES, RESOURCE_TEMPLATES, readResource } from './resources/index.js'
 
@@ -22,8 +26,14 @@ const TOOLS: McpTool[] = [
   ...accountTools, ...convenienceTools, ...chainTools,
   ...networkTools, ...tokenTools, ...contractTools,
   ...dexTools, ...onboardingTools, ...paymentTools,
-  ...intentTools, ...standingOrderTools, ...withdrawTools,
+  ...intentTools, ...standingOrderTools, ...withdrawTools, ...policyTools, ...broadcastTools,
+  ...agentPaymentTools,
 ]
+
+// Apply annotations from central registry
+for (const t of TOOLS) {
+  if (TOOL_ANNOTATIONS[t.name]) t.annotations = TOOL_ANNOTATIONS[t.name]
+}
 
 const toolMap = new Map(TOOLS.map(t => [t.name, t]))
 const promptMap = new Map(ALL_PROMPTS.map(p => [p.name, p]))
@@ -39,7 +49,7 @@ export async function handleRequest(req: McpRequest): Promise<McpResponse> {
         result = {
           protocolVersion: version,
           capabilities: { tools: {}, prompts: {}, resources: {} },
-          serverInfo: { name: 'merx', version: '1.0.0' },
+          serverInfo: { name: 'merx', version: '2.0.0' },
         }
         break
       }
@@ -47,7 +57,10 @@ export async function handleRequest(req: McpRequest): Promise<McpResponse> {
         result = {}
         break
       case 'tools/list':
-        result = { tools: TOOLS.map(t => ({ name: t.name, description: t.description, inputSchema: t.inputSchema })) }
+        result = { tools: TOOLS.map(t => ({
+          name: t.name, description: t.description, inputSchema: t.inputSchema,
+          ...(t.annotations ? { annotations: t.annotations } : {}),
+        })) }
         break
       case 'tools/call':
         result = await callTool(req.params ?? {})

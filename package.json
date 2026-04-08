@@ -1,7 +1,7 @@
 {
   "name": "merx-mcp",
-  "version": "1.0.5",
-  "description": "The complete TRON infrastructure layer for AI agents. 64 tools, 30 prompts, 21 resources. MCP + A2A + ACP + x402 v2 facilitator.",
+  "version": "1.0.6",
+  "description": "The complete TRON infrastructure layer for AI agents. 66 tools, 30 prompts, 21 resources. MCP + A2A + ACP + x402 v2 facilitator.",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {

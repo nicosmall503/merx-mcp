@@ -74,7 +74,26 @@ export const CONCEPTS: Record<string, string> = {
 
 export function getConcept(topic: string): string | null {
   const key = topic.toLowerCase().replace(/[\s-]/g, '_')
-  return CONCEPTS[key] ?? null
+  // 1. Exact match
+  if (CONCEPTS[key]) return CONCEPTS[key]
+  // 2. Substring match: requested topic is contained in a known key, or vice versa
+  // (e.g. "energy" matches "burn_vs_rent" because key contains "rent" — no.
+  //  Better: check both directions for prefix/contains)
+  for (const k of Object.keys(CONCEPTS)) {
+    if (k.includes(key) || key.includes(k)) return CONCEPTS[k]
+  }
+  return null
+}
+
+// Returns the closest matching topic key by substring, or null if nothing close.
+// Used by explain_concept to suggest a fallback when the user asks about
+// something we don't have a hardcoded entry for.
+export function suggestClosestTopic(topic: string): string | null {
+  const key = topic.toLowerCase().replace(/[\s-]/g, '_')
+  for (const k of Object.keys(CONCEPTS)) {
+    if (k.includes(key) || key.includes(k)) return k
+  }
+  return null
 }
 
 export function listTopics(): string[] {

@@ -69,11 +69,12 @@ export function formatOrderDetail(o: Order): string {
 }
 
 function formatOrderRow(o: Order): string {
-  const id = o.id.slice(0, 8)
+  // Always show the FULL UUID — agents need to pass it to get_order/wait_for_delegation.
+  // A truncated id like "b5cbe7df.." is unusable.
   const cost = o.total_cost_sun ? sunToTrx(Number(o.total_cost_sun)) : '-'
   const dur = o.duration_sec ? formatDuration(o.duration_sec) : '-'
   const amt = o.amount ? formatNumber(o.amount) : '-'
-  return `${id}.. | ${o.status} | ${safe(o.resource_type, '-')} | ${amt} | ${dur} | ${cost}`
+  return `${o.id} | ${o.status} | ${safe(o.resource_type, '-')} | ${amt} | ${dur} | ${cost}`
 }
 
 export function formatOrderTable(data: unknown): string {
@@ -87,31 +88,48 @@ export function formatOrderTable(data: unknown): string {
     return 'No orders found.'
   }
   if (orders.length === 0) return 'No orders found.'
-  const header = 'ID | Status | Resource | Amount | Duration | Cost (TRX)'
-  const sep = '---|--------|----------|--------|----------|----------'
+  const header = 'Order ID (UUID) | Status | Resource | Amount | Duration | Cost (TRX)'
+  const sep = '----------------|--------|----------|--------|----------|----------'
   const rows = orders.map(formatOrderRow)
-  return [header, sep, ...rows].join('\n')
+  // Hint moved AFTER data so machine consumers can split on the blank line
+  return [header, sep, ...rows, '', `(Pass the full UUID to get_order or wait_for_delegation to inspect or poll an order.)`].join('\n')
+}
+
+function formatCost(value: unknown): string {
+  if (value == null) return 'pending'
+  const n = typeof value === 'number' ? value : parseFloat(String(value))
+  if (!Number.isFinite(n)) return 'pending'
+  return `${n.toFixed(4)} TRX`
 }
 
 export function formatEnsureResult(data: EnsureResult): string {
   if (data.action === 'no_action_needed') {
-    return 'Resources sufficient. No purchase needed.'
+    const lines = ['Resources sufficient. No purchase needed.']
+    if (data.energy?.current != null) lines.push(`  Energy:    ${data.energy.current}`)
+    if (data.bandwidth?.current != null) lines.push(`  Bandwidth: ${data.bandwidth.current}`)
+    return lines.join('\n')
   }
   const lines = ['--- Ensure Resources ---', '']
   if (data.energy) {
     lines.push(`Energy: current ${data.energy.current ?? 0}, deficit ${data.energy.deficit ?? 0}`)
     if (data.energy.order_id) {
-      const cost = typeof data.energy.cost_trx === 'number' ? data.energy.cost_trx.toFixed(4) : '?'
-      lines.push(`  Order: ${data.energy.order_id} (${cost} TRX)`)
+      lines.push(`  Order: ${data.energy.order_id} (cost: ${formatCost(data.energy.cost_trx)})`)
     }
   }
   if (data.bandwidth) {
     lines.push(`Bandwidth: current ${data.bandwidth.current ?? 0}, deficit ${data.bandwidth.deficit ?? 0}`)
     if (data.bandwidth.order_id) {
-      const cost = typeof data.bandwidth.cost_trx === 'number' ? data.bandwidth.cost_trx.toFixed(4) : '?'
-      lines.push(`  Order: ${data.bandwidth.order_id} (${cost} TRX)`)
+      lines.push(`  Order: ${data.bandwidth.order_id} (cost: ${formatCost(data.bandwidth.cost_trx)})`)
     }
   }
-  if (data.total_cost_trx != null) lines.push('', `Total cost: ${Number(data.total_cost_trx).toFixed(4)} TRX`)
+  // Show total only if we have a real number — otherwise it's 0 by default and confuses
+  if (data.total_cost_trx != null) {
+    const total = Number(data.total_cost_trx)
+    if (Number.isFinite(total) && total > 0) {
+      lines.push('', `Total cost: ${total.toFixed(4)} TRX`)
+    } else {
+      lines.push('', `Total cost: pending (orders still being filled — call get_order or wait_for_delegation with the order UUID above to see final cost)`)
+    }
+  }
   return lines.join('\n')
 }

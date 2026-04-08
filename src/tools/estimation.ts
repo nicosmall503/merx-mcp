@@ -74,7 +74,7 @@ function formatResources(d: ResourcesResponse): string {
 const estimateTransactionCost: McpTool = {
   name: 'estimate_transaction_cost',
   description:
-    'Estimate energy and bandwidth cost for a TRON transaction. Compares rental vs burn cost. No auth required.',
+    'Estimate cost of a TRON transaction BEFORE sending. Aliases: estimate_cost, calculate_cost, transaction_cost, energy_cost, transfer_cost. Calculate exactly how much energy, bandwidth, and TRX a TRON transaction will cost before sending it. Use this to answer questions like "how much does a USDT transfer cost?" or "what will it cost me to send 100 USDT to address X?". Returns: energy units needed, bandwidth needed, TRX cost if you burn directly, and TRX cost if you rent energy from Merx (typically 70-80% cheaper). Supports trc20_transfer (e.g. USDT/USDC), trc20_approve, trx_transfer, and custom contract calls. No auth required.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -119,8 +119,17 @@ const checkAddressResources: McpTool = {
   },
   async handler(input) {
     try {
-      const data = await publicGet(`/api/v1/chain/resources/${input.address}`) as ResourcesResponse
-      return textResult(formatResources(data))
+      // /chain/resources/:address returns ONLY energy/bandwidth — fetch balance in parallel
+      // and merge so the user sees TRX too.
+      const [resData, balData] = await Promise.all([
+        publicGet(`/api/v1/chain/resources/${input.address}`) as Promise<ResourcesResponse>,
+        publicGet(`/api/v1/chain/balance/${input.address}`).catch(() => null) as Promise<Record<string, unknown> | null>,
+      ])
+      const merged: ResourcesResponse = {
+        ...resData,
+        trx_balance_sun: Number(balData?.balance_sun ?? balData?.balance ?? 0),
+      }
+      return textResult(formatResources(merged))
     } catch (e) {
       return errorResult((e as Error).message)
     }

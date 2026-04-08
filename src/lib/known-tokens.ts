@@ -49,3 +49,14 @@ export function resolveToken(
   }
   return null
 }
+
+// Reverse lookup: find a known token by its on-chain address.
+// Used by read_contract to apply correct decimals to balanceOf/totalSupply results.
+export function lookupTokenByAddress(
+  address: string
+): { symbol: string; decimals: number; name: string } | null {
+  for (const [symbol, info] of Object.entries(KNOWN_TOKENS)) {
+    if (info.address === address) return { symbol, decimals: info.decimals, name: info.name }
+  }
+  return null
+}

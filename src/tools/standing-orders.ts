@@ -1,4 +1,4 @@
-import { authGet, authPost, hasApiKey } from '../lib/api.js'
+import { authGet, authPost, authDelete, hasApiKey } from '../lib/api.js'
 import { textResult, errorResult } from '../lib/formatter.js'
 import type { McpTool } from '../types.js'
 import {
@@ -124,33 +124,35 @@ const listStandingOrders: McpTool = {
 const createMonitor: McpTool = {
   name: 'create_monitor',
   description:
-    'Create a persistent monitor (delegation expiry, balance, price alert). Auth required.',
+    'Create a persistent server-side monitor that fires notifications when a condition is met. Four monitor types: delegation_expiry (warns when leased energy is about to expire so you can re-rent), balance_threshold (fires when an address goes below a TRX/USDT level), price_alert (fires when energy/bandwidth price crosses a SUN threshold), address_activity (fires on any incoming TX). Notification defaults to webhook=true if omitted. Auth required (API key).',
   inputSchema: {
     type: 'object',
     properties: {
       monitor_type: {
         type: 'string',
-        enum: ['delegation_expiry', 'balance_threshold', 'price_alert'],
+        enum: ['delegation_expiry', 'balance_threshold', 'price_alert', 'address_activity'],
         description: 'Type of monitor to create.',
       },
       target_address: {
         type: 'string',
-        description: 'TRON address to monitor (for delegation_expiry).',
+        description: 'TRON address to monitor. Required for delegation_expiry, balance_threshold, address_activity. Not used for price_alert.',
       },
       params: {
         type: 'object',
-        description: 'Monitor params: { alert_before_sec, auto_renew, resource_type, max_price_sun, duration_sec }.',
+        description: 'Type-specific params. delegation_expiry: { alert_before_sec, auto_renew, resource_type }. balance_threshold: { resource: "TRX"|"ENERGY"|"BANDWIDTH", below: number }. price_alert: { resource: "ENERGY"|"BANDWIDTH", above_sun?: number, below_sun?: number }. address_activity: { min_amount_trx?: number }.',
       },
       notify: {
         type: 'object',
-        description: 'Notification config: { webhook, telegram_chat_id }.',
+        description: 'Notification config: { webhook?: boolean, telegram_chat_id?: string }. Defaults to { webhook: true } if omitted.',
       },
     },
-    required: ['monitor_type', 'params', 'notify'],
+    required: ['monitor_type', 'params'],
   },
   async handler(input) {
     try {
       requireAuth()
+      if (input.monitor_type == null) return errorResult('monitor_type is required')
+      if (input.params == null) return errorResult('params is required (object with type-specific fields, see description)')
       const payload: Record<string, unknown> = {
         monitor_type: input.monitor_type,
         params: input.params,
@@ -167,7 +169,7 @@ const createMonitor: McpTool = {
 
 const listMonitors: McpTool = {
   name: 'list_monitors',
-  description: 'List all monitors with optional status filter. Auth required.',
+  description: 'List all monitors you created with create_monitor, optionally filtered by status (ACTIVE/CANCELLED). Each row shows the full monitor UUID (pass to cancel_monitor), monitor type, target address, and status. Note: the Target column will be empty for monitor types that do not have a single watched address — specifically price_alert and balance_threshold (when watching the API key holder rather than a third-party address). For delegation_expiry and address_activity monitors, Target will always be set. Auth required (API key).',
   inputSchema: {
     type: 'object',
     properties: {
@@ -190,9 +192,81 @@ const listMonitors: McpTool = {
   },
 }
 
+const getStandingOrder: McpTool = {
+  name: 'get_standing_order',
+  description: 'Get full details of a single standing order by its UUID. Returns trigger config, action params, budget, executions count, and status. Auth required (API key).',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: { type: 'string', description: 'Standing order UUID (from list_standing_orders).' },
+    },
+    required: ['order_id'],
+  },
+  async handler(input) {
+    try {
+      requireAuth()
+      const id = input.order_id as string
+      if (!id) return errorResult('order_id is required')
+      const data = await authGet(`/api/v1/standing-orders/${id}`) as StandingOrder
+      return textResult(formatStandingOrderDetail(data))
+    } catch (e) {
+      return errorResult((e as Error).message)
+    }
+  },
+}
+
+const cancelStandingOrder: McpTool = {
+  name: 'cancel_standing_order',
+  description: 'Cancel a standing order by its UUID. The order is moved to CANCELLED status and will not trigger again. Already-executed actions are NOT reversed. Auth required (API key).',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      order_id: { type: 'string', description: 'Standing order UUID to cancel.' },
+    },
+    required: ['order_id'],
+  },
+  async handler(input) {
+    try {
+      requireAuth()
+      const id = input.order_id as string
+      if (!id) return errorResult('order_id is required')
+      await authDelete(`/api/v1/standing-orders/${id}`)
+      return textResult(`Standing order ${id} cancelled.`)
+    } catch (e) {
+      return errorResult((e as Error).message)
+    }
+  },
+}
+
+const cancelMonitor: McpTool = {
+  name: 'cancel_monitor',
+  description: 'Cancel an active monitor by its UUID. The monitor stops firing notifications. Auth required (API key).',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      monitor_id: { type: 'string', description: 'Monitor UUID to cancel.' },
+    },
+    required: ['monitor_id'],
+  },
+  async handler(input) {
+    try {
+      requireAuth()
+      const id = input.monitor_id as string
+      if (!id) return errorResult('monitor_id is required')
+      await authDelete(`/api/v1/monitors/${id}`)
+      return textResult(`Monitor ${id} cancelled.`)
+    } catch (e) {
+      return errorResult((e as Error).message)
+    }
+  },
+}
+
 export const standingOrderTools: McpTool[] = [
   createStandingOrder,
   listStandingOrders,
+  getStandingOrder,
+  cancelStandingOrder,
   createMonitor,
   listMonitors,
+  cancelMonitor,
 ]

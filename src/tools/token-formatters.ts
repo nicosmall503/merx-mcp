@@ -71,13 +71,21 @@ export function formatTokenInfo(
   decimals: number,
   totalSupply: string
 ): string {
+  // Add thousands separators and unit suffix to match read_contract output
+  let supplyDisplay = totalSupply
+  const num = parseFloat(totalSupply)
+  if (Number.isFinite(num)) {
+    const [whole, frac] = totalSupply.split('.')
+    const wholeFormatted = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    supplyDisplay = (frac ? `${wholeFormatted}.${frac}` : wholeFormatted) + ` ${symbol}`
+  }
   return [
     '--- Token Info ---',
     `Address:      ${address}`,
     `Name:         ${name}`,
     `Symbol:       ${symbol}`,
     `Decimals:     ${decimals}`,
-    `Total Supply: ${totalSupply}`,
+    `Total Supply: ${supplyDisplay}`,
   ].join('\n')
 }
 

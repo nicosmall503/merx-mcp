@@ -1,4 +1,5 @@
 import { formatNumber } from '../lib/formatter.js'
+import { hexToBase58 } from './network-helpers.js'
 
 export interface ChainParam {
   key: string
@@ -63,17 +64,51 @@ export function formatTxHistory(
   ].join('\n')
 }
 
+function toBase58IfHex(addr: string): string {
+  // TronGrid raw_data returns addresses as hex (41xxxx...). Convert to base58 (T...) for display.
+  if (!addr || addr === '-') return addr
+  if (addr.startsWith('T') && addr.length === 34) return addr
+  if (/^41[0-9a-fA-F]{40}$/.test(addr)) {
+    try {
+      return hexToBase58(addr)
+    } catch {
+      return addr
+    }
+  }
+  return addr
+}
+
 function formatTxRow(e: Record<string, unknown>): string {
-  // TronGrid format: raw_data.timestamp, raw_data.contract[0].type + parameter.value
+  // Two possible shapes from TronGrid:
+  //   1. Native TRX/contract tx: { raw_data: { timestamp, contract: [{type, parameter}] }, ... }
+  //   2. TRC20 transfer (from /transactions/trc20): { block_timestamp, from, to, value, token_info: { symbol, decimals } }
   const rawData = e.raw_data as Record<string, unknown> | undefined
   const ts = rawData?.timestamp ?? e.block_timestamp ?? e.timestamp
   const date = ts ? new Date(Number(ts)).toISOString().slice(0, 19).replace('T', ' ') : 'N/A'
-  const contracts = rawData?.contract as Array<Record<string, unknown>> | undefined
-  const c = contracts?.[0]
-  const txType = String(c?.type ?? e.type ?? 'transfer').replace('Contract', '')
-  const val = (c?.parameter as Record<string, unknown>)?.value as Record<string, unknown> | undefined
-  const to = String(val?.to_address ?? val?.contract_address ?? e.to ?? '')
-  const counterparty = to ? to.slice(0, 12) + '...' : 'N/A'
-  const amt = val?.amount != null ? (Number(val.amount) / 1_000_000).toFixed(2) + ' TRX' : ''
-  return `  ${date.padEnd(20)} ${txType.padEnd(16)} ${counterparty.padEnd(16)} ${amt}`
+
+  // Path 1: native TRX (TransferContract) or generic smart-contract call
+  if (rawData) {
+    const contracts = rawData.contract as Array<Record<string, unknown>> | undefined
+    const c = contracts?.[0]
+    const txType = String(c?.type ?? 'TransferContract').replace('Contract', '')
+    const val = (c?.parameter as Record<string, unknown>)?.value as Record<string, unknown> | undefined
+    const rawTo = String(val?.to_address ?? val?.contract_address ?? val?.receiver_address ?? '-')
+    const to = toBase58IfHex(rawTo)
+    const amt = val?.amount != null
+      ? (Number(val.amount) / 1_000_000).toFixed(6) + ' TRX'
+      : ''
+    return `  ${date.padEnd(20)} ${txType.padEnd(16)} ${to.padEnd(36)} ${amt}`
+  }
+
+  // Path 2: TRC20 transfer entry (from TronGrid trc20 endpoint)
+  const txType = 'TRC20Transfer'
+  const to = String(e.to ?? '-')
+  const tokenInfo = e.token_info as { symbol?: string; decimals?: number } | undefined
+  const symbol = tokenInfo?.symbol ?? 'TRC20'
+  const decimals = tokenInfo?.decimals ?? 6
+  const rawAmt = e.value
+  const amt = rawAmt != null
+    ? (Number(rawAmt) / Math.pow(10, decimals)).toFixed(decimals < 6 ? decimals : 6) + ` ${symbol}`
+    : ''
+  return `  ${date.padEnd(20)} ${txType.padEnd(16)} ${to.padEnd(36)} ${amt}`
 }

@@ -1,4 +1,5 @@
 import { sunToTrx, formatNumber } from '../lib/formatter.js'
+import { hexToBase58 } from './network-helpers.js'
 
 // API returns: { balance, exists, resources: { energyLimit, energyUsed, bandwidthLimit, bandwidthUsed, freeNetLimit, freeNetUsed } }
 export function formatAccountInfo(data: Record<string, unknown>, address: string): string {
@@ -36,6 +37,19 @@ export function formatTokenBalance(token: string, rawBal: bigint, decimals: numb
   return `Balance: ${whole}.${fracStr} ${token} (raw: ${rawBal.toString()})`
 }
 
+function toBase58IfHex(addr: unknown): string {
+  if (typeof addr !== 'string' || addr.length === 0) return 'N/A'
+  if (addr.startsWith('T') && addr.length === 34) return addr
+  if (/^41[0-9a-fA-F]{40}$/.test(addr)) {
+    try {
+      return hexToBase58(addr)
+    } catch {
+      return addr
+    }
+  }
+  return addr
+}
+
 function extractTxFields(tx: Record<string, unknown>) {
   const raw = tx.raw_data as Record<string, unknown> | undefined
   const contracts = raw?.contract as Array<Record<string, unknown>> | undefined
@@ -46,7 +60,15 @@ function extractTxFields(tx: Record<string, unknown>) {
   const status = ret?.[0]?.contractRet ?? 'UNKNOWN'
   const amount = val?.amount != null ? sunToTrx(Number(val.amount)) + ' TRX' : 'N/A'
   const ts = raw?.timestamp ? new Date(Number(raw.timestamp)).toISOString() : 'N/A'
-  return { status, type: c.type ?? 'Unknown', from: val?.owner_address ?? 'N/A', to: val?.to_address ?? val?.contract_address ?? 'N/A', amount, ts }
+  // TRON node returns addresses as hex (41xxxx) — convert to base58 for human display
+  return {
+    status,
+    type: c.type ?? 'Unknown',
+    from: toBase58IfHex(val?.owner_address),
+    to: toBase58IfHex(val?.to_address ?? val?.contract_address),
+    amount,
+    ts,
+  }
 }
 
 // API returns: { transaction: {...}, info: {...} }
@@ -73,14 +95,19 @@ export function formatTransaction(resp: Record<string, unknown>): string {
 export function formatBlock(data: Record<string, unknown>): string {
   const header = data.block_header as Record<string, unknown> | undefined
   const raw = header?.raw_data as Record<string, unknown> | undefined
+  // TRON node returns an empty object {} when block does not exist (not an error).
+  // Detect that and surface a clear message instead of "N/A N/A 0 N/A".
+  if (!header || !raw || !data.blockID) {
+    return 'Block not found. The block number may be in the future or beyond the node\'s history.'
+  }
   const txs = data.transactions as unknown[] | undefined
-  const ts = raw?.timestamp ? new Date(Number(raw.timestamp)).toISOString() : 'N/A'
+  const ts = raw.timestamp ? new Date(Number(raw.timestamp)).toISOString() : 'N/A'
   return [
     'Block',
     '-----',
-    `  Number:    ${raw?.number ?? 'N/A'}`,
+    `  Number:    ${raw.number ?? 'N/A'}`,
     `  Timestamp: ${ts}`,
     `  TX Count:  ${txs?.length ?? 0}`,
-    `  Hash:      ${data.blockID ?? 'N/A'}`,
+    `  Hash:      ${data.blockID}`,
   ].join('\n')
 }

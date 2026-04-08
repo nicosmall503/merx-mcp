@@ -23,7 +23,7 @@ import {
 
 const getAccountInfo: McpTool = {
   name: 'get_account_info',
-  description: 'Full on-chain account state: TRX balance, energy, bandwidth, creation date. No auth required.',
+  description: 'Inspect any TRON address. Aliases: check_address, get_address_info, get_wallet_info, address_info, account_status. Read the full on-chain state of ANY TRON address (does not have to be your own): TRX balance, free + delegated energy, free + delegated bandwidth, frozen TRX, account creation timestamp. Use this to check if an address has enough resources before sending a transaction, or to inspect any TRON wallet. No auth required, no API key needed.',
   inputSchema: {
     type: 'object',
     properties: {

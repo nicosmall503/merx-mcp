@@ -3,7 +3,7 @@
   "maintainers": ["Hovsteder"],
   "name": "merx-mcp",
   "displayName": "MERX - TRON Infrastructure for AI Agents",
-  "description": "The complete TRON infrastructure layer for AI agents. 64 MCP tools across 18 categories: energy aggregation across 6 providers, TRC-20 stablecoin payments (USDT/USDC/USDD), agent payment service (send/receive/watch/invoice), x402 v2 facilitator (only TRON facilitator in coinbase/x402 ecosystem registry), GasFree transfers, SunSwap V2 DEX, standing orders, natural language Policy Engine, on-chain queries. Also exposes A2A (Google, 7 skills) and ACP (BeeAI, 7 capabilities) protocols.",
+  "description": "The complete TRON infrastructure layer for AI agents. 66 MCP tools across 18 categories: energy aggregation across 6 providers, TRC-20 stablecoin payments (USDT/USDC/USDD), agent payment service (send/receive/watch/invoice), x402 v2 facilitator (only TRON facilitator in coinbase/x402 ecosystem registry), GasFree transfers, SunSwap V2 DEX, standing orders, natural language Policy Engine, on-chain queries. Also exposes A2A (Google, 7 skills) and ACP (BeeAI, 7 capabilities) protocols.",
   "homepage": "https://merx.exchange",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
   ],
   "categories": ["blockchain", "finance", "agent-orchestration"],
   "tags": ["tron", "energy", "bandwidth", "usdt", "usdc", "usdd", "stablecoin", "defi", "sunswap", "x402", "gasfree", "agent-payments", "a2a", "acp", "multi-protocol"],
-  "tools": 64,
+  "tools": 66,
   "prompts": 30,
   "resources": 21,
   "author": {

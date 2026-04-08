@@ -127,7 +127,7 @@ const depositTrxTool: McpTool = {
 
 const enableAutoDepositTool: McpTool = {
   name: 'enable_auto_deposit',
-  description: 'Configure automatic top-up when balance drops below a threshold. Session-only.',
+  description: 'Configure automatic top-up when balance drops below a threshold. The configuration lives ONLY in the current MCP session — it is held in memory by the MCP server process and is lost on server restart, MCP client reconnect, or server redeploy. Top-ups are signed locally with TRON_PRIVATE_KEY and sent to your Merx deposit address (memo-routed). For persistent auto-deposit you currently need to call this tool again at the start of each session.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -139,10 +139,37 @@ const enableAutoDepositTool: McpTool = {
   },
   async handler(input) {
     if (!hasApiKey()) return errorResult('MERX_API_KEY is required')
+
+    // Coerce + validate threshold
+    const rawThreshold = input.threshold_trx
+    if (rawThreshold == null || rawThreshold === '') {
+      return errorResult('threshold_trx is required (positive TRX amount, e.g. "50")')
+    }
+    const threshold = parseFloat(String(rawThreshold))
+    if (!Number.isFinite(threshold) || threshold <= 0) {
+      return errorResult(`threshold_trx must be a positive number (got: "${rawThreshold}")`)
+    }
+
+    // Coerce + validate deposit amount
+    const rawDeposit = input.deposit_amount_trx
+    if (rawDeposit == null || rawDeposit === '') {
+      return errorResult('deposit_amount_trx is required (positive TRX amount, e.g. "100")')
+    }
+    const depositAmount = parseFloat(String(rawDeposit))
+    if (!Number.isFinite(depositAmount) || depositAmount <= 0) {
+      return errorResult(`deposit_amount_trx must be a positive number (got: "${rawDeposit}")`)
+    }
+
+    // Validate max daily
+    const maxDaily = input.max_daily_deposits != null ? Number(input.max_daily_deposits) : 5
+    if (!Number.isFinite(maxDaily) || maxDaily <= 0) {
+      return errorResult('max_daily_deposits must be a positive integer')
+    }
+
     autoDepositConfig = {
-      thresholdTrx: input.threshold_trx as string,
-      depositAmountTrx: input.deposit_amount_trx as string,
-      maxDailyDeposits: (input.max_daily_deposits as number) ?? 5,
+      thresholdTrx: String(threshold),
+      depositAmountTrx: String(depositAmount),
+      maxDailyDeposits: Math.floor(maxDaily),
     }
     return textResult(formatAutoDeposit(autoDepositConfig))
   },
@@ -150,7 +177,7 @@ const enableAutoDepositTool: McpTool = {
 
 const payInvoiceTool: McpTool = {
   name: 'pay_invoice',
-  description: 'Pay an x402 invoice by sending TRX and verifying payment.',
+  description: 'Pay an x402 invoice by signing and broadcasting a TRX transfer to the invoice address, then verifying the payment with the facilitator. x402 (Coinbase + Cloudflare HTTP 402 standard) is the protocol AI agents use to pay APIs per call. Use this when you receive an invoice_id from a paywalled service or another agent. REQUIRES: TRON_PRIVATE_KEY in env (use set_private_key first) AND a valid invoice_id from create_invoice or x402 challenge response. The transfer is signed locally — your private key never leaves the MCP process.',
   inputSchema: {
     type: 'object',
     properties: { invoice_id: { type: 'string', description: 'Invoice ID to pay' } },

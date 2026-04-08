@@ -44,13 +44,23 @@ export function pickBestDuration(
   minSec: number,
   maxSec: number,
 ): PricePoint | null {
-  const candidates = durations.filter(d => d.duration_sec >= minSec)
-  if (candidates.length === 0) return durations[durations.length - 1] ?? null
-  if (maxSec > 0) {
-    const inRange = candidates.filter(d => d.duration_sec <= maxSec)
-    if (inRange.length > 0) return inRange[0]
+  // Pick by LOWEST PRICE within the duration range — not by shortest duration.
+  // The previous version returned candidates[0] which, after sort-by-duration,
+  // was the shortest tier — usually the most expensive per unit.
+  function cheapest(points: PricePoint[]): PricePoint | null {
+    if (points.length === 0) return null
+    return points.reduce((best, cur) => (cur.price_sun < best.price_sun ? cur : best), points[0])
   }
-  return candidates[0]
+
+  const inRange = durations.filter(
+    d => d.duration_sec >= minSec && (maxSec <= 0 || d.duration_sec <= maxSec)
+  )
+  const cheapestInRange = cheapest(inRange)
+  if (cheapestInRange) return cheapestInRange
+
+  // Fallback: nothing in the requested range — return the cheapest tier ≥ minSec
+  const fallback = durations.filter(d => d.duration_sec >= minSec)
+  return cheapest(fallback) ?? durations[durations.length - 1] ?? null
 }
 
 export function buildDurationTable(durations: PricePoint[]): string {

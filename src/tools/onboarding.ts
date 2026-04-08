@@ -142,9 +142,15 @@ const setApiKeyTool: McpTool = {
     required: ['api_key'],
   },
   async handler(input) {
-    const key = input.api_key as string
+    const key = input.api_key
+    if (typeof key !== 'string' || key.length === 0) {
+      return errorResult('api_key parameter is required and must be a non-empty string')
+    }
     if (!key.startsWith('sk_live_')) {
       return errorResult('API key must start with sk_live_')
+    }
+    if (key.length < 24) {
+      return errorResult('API key looks too short — expected at least 24 characters after the sk_live_ prefix')
     }
     process.env.MERX_API_KEY = key
     return textResult([

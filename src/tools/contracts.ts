@@ -1,4 +1,4 @@
-import { publicPost, hasPrivateKey } from '../lib/api.js'
+import { publicGet, publicPost, hasPrivateKey } from '../lib/api.js'
 import { textResult, errorResult } from '../lib/formatter.js'
 import {
   ensureResources, formatResourceResult,
@@ -195,8 +195,45 @@ const callContract: McpTool = {
   },
 }
 
+const getContractInfo: McpTool = {
+  name: 'get_contract_info',
+  description:
+    'Get on-chain metadata for a TRON smart contract: existence check, owner address, energy origin, code hash, contract name (if set), ABI entries count. Use this to check whether an address is a contract before calling read_contract or estimate_contract_call. For TRC20-specific metadata (name, symbol, decimals, totalSupply) use get_token_info instead. No auth required.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      address: { type: 'string', description: 'Contract TRON address (T...)' },
+    },
+    required: ['address'],
+  },
+  async handler(input) {
+    try {
+      const addr = input.address as string
+      if (!addr) return errorResult('address is required')
+      const data = await publicGet(`/api/v1/chain/contract/${addr}`) as Record<string, unknown>
+      const lines = [
+        '--- Contract Info ---',
+        `Address:       ${data.contract_address ?? addr}`,
+        `Name:          ${data.name ?? '(not set)'}`,
+        `Origin:        ${data.origin_address ?? '(unknown)'}`,
+        `Origin Energy: ${data.origin_energy_limit ?? 0}`,
+        `Code hash:     ${typeof data.code_hash === 'string' ? data.code_hash.slice(0, 16) + '...' : '(none)'}`,
+        `ABI entries:   ${Array.isArray((data.abi as { entrys?: unknown[] })?.entrys) ? (data.abi as { entrys: unknown[] }).entrys.length : 0}`,
+      ]
+      return textResult(lines.join('\n'))
+    } catch (e) {
+      const msg = (e as Error).message
+      if (msg.includes('not found') || msg.includes('NOT_FOUND')) {
+        return errorResult('No contract deployed at this address (it may be a regular wallet, not a smart contract)')
+      }
+      return errorResult(msg)
+    }
+  },
+}
+
 export const contractTools: McpTool[] = [
   readContract,
   estimateContractCall,
   callContract,
+  getContractInfo,
 ]

@@ -8,11 +8,11 @@
 [![smithery badge](https://smithery.ai/badge/powersun/merx)](https://smithery.ai/servers/powersun/merx)
 [![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Tools](https://img.shields.io/badge/tools-64-blue)
+![Tools](https://img.shields.io/badge/tools-66-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)
 ![Resources](https://img.shields.io/badge/resources-21-purple)
 
-64 MCP tools. Energy market across 6 providers. USDT/USDC/USDD payments. x402 v2 facilitator on TRON mainnet.
+66 MCP tools. Energy market across 6 providers. USDT/USDC/USDD payments. x402 v2 facilitator on TRON mainnet.
 
 [Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api) | [MCP Server](#mcp-server)
 
@@ -50,7 +50,7 @@ MERX is the missing infrastructure layer that lets autonomous AI agents discover
 transact, and operate on TRON without ever touching energy, bandwidth, or
 low-level blockchain mechanics.
 
-The platform exposes one coherent stack: **64-tool MCP server**, **agent payment
+The platform exposes one coherent stack: **66-tool MCP server**, **agent payment
 service** for TRC-20 stablecoins, **x402 v2 facilitator** (the only TRON
 facilitator in the coinbase/x402 ecosystem registry), **GasFree transfers** via
 a MERX-deployed mainnet controller, **dedicated TRON RPC node**, **A2A** (Google,
@@ -69,7 +69,7 @@ integration with MERX.
 
 Three ways to plug an agent into MERX:
 
-- **MCP server** -- 64 tools for AI agents. Hosted SSE at
+- **MCP server** -- 66 tools for AI agents. Hosted SSE at
   `https://merx.exchange/mcp/sse` (zero install) or local stdio via
   `npx merx-mcp`. Works with Claude, GPT, Cursor, Windsurf, and any
   MCP-compatible client.
@@ -131,7 +131,7 @@ largest USDT network.
 | Agent has to integrate every energy provider's API | One MERX API routes to the cheapest of 6 providers |
 | No way to pay for TRON-hosted APIs in USDT | x402 v2 facilitator with full USDT/USDC/USDD support |
 | No A2A/ACP discovery on TRON | Agent Card + Manifest live, 7 skills, 7 capabilities |
-| Agent has to write its own MCP server for TRON | 64 tools, 30 prompts, 21 resources, hosted |
+| Agent has to write its own MCP server for TRON | 66 tools, 30 prompts, 21 resources, hosted |
 | Address watching means polling RPC | `watch()` with sub-3-second webhook delivery via ZMQ |
 
 ---
@@ -140,7 +140,7 @@ largest USDT network.
 
 | Component | Description |
 |---|---|
-| MCP server | **64 tools, 30 prompts, 21 resources** for AI agents. Hosted SSE at `https://merx.exchange/mcp/sse` (zero install) or local stdio. SEP-1649 server card. The largest TRON-native MCP server in production. |
+| MCP server | **66 tools, 30 prompts, 21 resources** for AI agents. Hosted SSE at `https://merx.exchange/mcp/sse` (zero install) or local stdio. SEP-1649 server card. The largest TRON-native MCP server in production. |
 | Claude Code plugin | One-line install: `/plugin marketplace add Hovsteder/merx-claude-plugin`. Auto-registers MCP, 6 slash commands, sub-agent. |
 | Agent Payment Service | `agent.merx.exchange` -- non-custodial REST API. `register`, `send`, `receive`, `watch`, `invoice`, `batch`, `schedule`, `contacts`. USDT live; USDD/USDC next sprint. |
 | x402 v2 Facilitator | `x402.merx.exchange` -- only TRON facilitator in the coinbase/x402 ecosystem registry. Three settlement schemes (`exact`, `exact_permit`, `exact_gasfree`) for USDT, USDC, USDD on TRON mainnet plus USDC on Base. |
@@ -288,7 +288,7 @@ To unlock write tools (send TRX, swap tokens), call `set_private_key`:
 
 ```
 set_private_key("your_64_char_hex_key")
--> Address derived automatically. All 64 tools available.
+-> Address derived automatically. All 66 tools available.
 -> Key never leaves your machine.
 ```
 
@@ -312,7 +312,7 @@ npm install -g merx
 }
 ```
 
-All 64 tools available from the first message.
+All 66 tools available from the first message.
 
 ### Additional protocol support
 
@@ -330,7 +330,7 @@ discovery surface:
 |---|---|---|
 | No keys | 22 | Prices, estimation, market analysis, on-chain queries, address lookups |
 | + `MERX_API_KEY` | 34 | + Orders, balance, deposits, standing orders, monitors |
-| + `TRON_PRIVATE_KEY` | 64 | + Send TRX/USDT/USDC/USDD, swap tokens, approve contracts, execute intents, agent payments |
+| + `TRON_PRIVATE_KEY` | 66 | + Send TRX/USDT/USDC/USDD, swap tokens, approve contracts, execute intents, agent payments |
 
 ---
 
@@ -419,7 +419,7 @@ configurable max price.
 
 ### Full MCP protocol
 
-The only TRON MCP server using all three MCP primitives: **tools (64), prompts
+The only TRON MCP server using all three MCP primitives: **tools (66), prompts
 (30), and resources (21 -- 14 static + 7 templates)**. Two transport modes:
 hosted SSE (zero install) and local stdio (full key management). Three
 protocol versions supported: `2024-11-05`, `2025-03-26`, `2025-06-18`.
@@ -643,7 +643,7 @@ Full API reference: [merx.exchange/docs/api](https://merx.exchange/docs/api)
 
 ## MCP server
 
-MERX provides a full MCP (Model Context Protocol) server for AI agents. 64 tools
+MERX provides a full MCP (Model Context Protocol) server for AI agents. 66 tools
 across 18 categories, 30 pre-built prompts, and 21 live data resources.
 
 > **Note:** the tool catalog table below was last fully audited at 52 tools.
@@ -758,7 +758,7 @@ Agent: [calls analyze_prices] Energy is at 22 SUN -- the 1st percentile
 
 ### Full tool reference
 
-All 64 tools with auth requirements. For input schemas and output examples, see
+All 66 tools with auth requirements. For input schemas and output examples, see
 [docs/TOOLS.md](docs/TOOLS.md).
 
 **Price Intelligence**
