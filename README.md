@@ -1,18 +1,18 @@
 # MERX
 ### https://MERX.exchange
 
-**The first TRON resource exchange.**
+**TRON infrastructure for AI agents.**
 
 <a href="https://glama.ai/mcp/servers/Hovsteder/merx-mcp"><img width="380" height="200" src="https://glama.ai/mcp/servers/Hovsteder/merx-mcp/badge" alt="MERX MCP server" /></a>
 
 [![smithery badge](https://smithery.ai/badge/powersun/merx)](https://smithery.ai/servers/powersun/merx)
 [![npm version](https://img.shields.io/npm/v/merx-mcp.svg)](https://www.npmjs.com/package/merx-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Tools](https://img.shields.io/badge/tools-55-blue)
+![Tools](https://img.shields.io/badge/tools-64-blue)
 ![Prompts](https://img.shields.io/badge/prompts-30-green)
 ![Resources](https://img.shields.io/badge/resources-21-purple)
 
-One platform. Every energy and bandwidth provider. Best price automatically.
+64 MCP tools. Energy market across 6 providers. USDT/USDC/USDD payments. x402 v2 facilitator on TRON mainnet.
 
 [Documentation](https://merx.exchange/docs) | [API Reference](https://merx.exchange/docs/api) | [MCP Server](#mcp-server)
 
@@ -20,11 +20,11 @@ One platform. Every energy and bandwidth provider. Best price automatically.
 
 ## Table of contents
 
-- [What is MERX](#what-is-merx)
-- [The problem](#the-problem)
-- [Platform overview](#platform-overview)
-- [Quick start](#quick-start)
-- [What sets MERX apart](#what-sets-merx-apart)
+- [What is MERX](#what-is-merx) — TRON infrastructure for AI agents
+- [The problem](#the-problem) — why TRON had no agent layer until MERX
+- [Platform overview](#platform-overview) — MCP, agent payment service, x402, GasFree, energy aggregator
+- [Quick start](#quick-start) — 4 paths (web, REST/SDK, Claude Code plugin, MCP)
+- [What sets MERX apart](#what-sets-merx-apart) — only complete agent stack on TRON
 - [Architecture](#architecture)
 - [API overview](#api-overview)
 - [MCP server](#mcp-server)
@@ -44,60 +44,95 @@ One platform. Every energy and bandwidth provider. Best price automatically.
 
 ## What is MERX
 
-MERX is a TRON resource exchange that aggregates every major energy and bandwidth
-provider into a single platform. It monitors prices across all connected providers
-every 30 seconds, compares every duration tier, and routes orders to the cheapest
-available source automatically. If a provider fails or runs out of capacity, the
-next cheapest fills the order. No manual comparison. No provider lock-in.
+**MERX is the infrastructure layer for AI agents and agentic networks on TRON.**
+Where Stripe is infrastructure for web commerce and Cloudflare for the open web,
+MERX is the missing infrastructure layer that lets autonomous AI agents discover,
+transact, and operate on TRON without ever touching energy, bandwidth, or
+low-level blockchain mechanics.
 
-The platform handles the full resource lifecycle: price discovery, order routing,
-delegation verification, and transaction execution. All amounts are tracked in SUN
-internally (1 TRX = 1,000,000 SUN) for precision.
+The platform exposes one coherent stack: **64-tool MCP server**, **agent payment
+service** for TRC-20 stablecoins, **x402 v2 facilitator** (the only TRON
+facilitator in the coinbase/x402 ecosystem registry), **GasFree transfers** via
+a MERX-deployed mainnet controller, **dedicated TRON RPC node**, **A2A** (Google,
+7 skills) and **ACP** (BeeAI, 7 capabilities) protocol coverage, and a **natural
+language Policy Engine** powered by Anthropic Claude.
 
-Three ways to use MERX:
+Underneath those agent surfaces sits an **energy aggregator across 6 active
+providers** (CatFee, Netts, TronSave, iTRX, PowerSun, TEM) that routes resource
+purchases to the cheapest source automatically -- so when an agent calls
+`send()`, MERX estimates the energy required, buys only the deficit, and
+broadcasts the transaction. The agent never holds TRX or thinks about energy.
 
-- **Web platform** at [merx.exchange](https://merx.exchange) -- trade energy and
-  bandwidth through the dashboard, manage deposits and withdrawals, view order
-  history, and monitor delegations.
+**Any AI agent** running in Claude, LangChain, CrewAI, Vertex AI, AutoGen,
+or BeeAI can send payments and acquire resources on TRON through a single
+integration with MERX.
 
-- **REST API + SDKs** -- integrate TRON resource management into any application
-  with JavaScript, Python, or raw HTTP. 46 endpoints covering prices, orders,
-  balance, deposits, withdrawals, webhooks, and API key management.
+Three ways to plug an agent into MERX:
 
-- **MCP server** -- give AI agents full TRON access through 55 tools, 30 prompts,
-  and 21 resources. Works with Claude, GPT, Cursor, and any MCP-compatible client.
-  Zero install via hosted SSE, or run locally via stdio.
+- **MCP server** -- 64 tools for AI agents. Hosted SSE at
+  `https://merx.exchange/mcp/sse` (zero install) or local stdio via
+  `npx merx-mcp`. Works with Claude, GPT, Cursor, Windsurf, and any
+  MCP-compatible client.
+
+- **Claude Code plugin** -- one-line install for Claude Code. Auto-registers
+  the MCP server, ships 6 slash commands and a `tron-agent-engineer` sub-agent.
+  See [Hovsteder/merx-claude-plugin](https://github.com/Hovsteder/merx-claude-plugin).
+
+- **REST API + SDKs** -- direct programmatic access for agents that aren't
+  using MCP. JavaScript (`merx-sdk` v2.1 on npm), Python (`merx-sdk` v2.1 on
+  PyPI), or raw HTTP against `/api/v1/` (70+ versioned endpoints).
+
+For human users, the web platform at [merx.exchange](https://merx.exchange)
+remains available for manual energy trading, dashboard, deposits, and
+withdrawals -- but the platform is built primarily for agents.
 
 ---
 
 ## The problem
 
-Every smart contract call on TRON requires energy. Without energy, TRX tokens are
-burned as fees. A single USDT transfer burns 3-13 TRX depending on whether the
-receiving address has held USDT before (approximately $1-4 at current prices).
-With rented energy, the same transfer costs 0.17-1.43 TRX. That is up to a
-**94% reduction** in transaction costs.
+AI agents will become the dominant transactional users of stablecoins, and
+TRON -- home to USDD, $86B+ USDT, USDC, and the dominant chain for retail USDT
+in Southeast Asia, Africa, and Latin America -- is already the largest
+USDT-native network in the world.
 
-High-volume wallets -- exchanges, payment processors, trading bots -- burn
-thousands of TRX daily without resource optimization.
+But TRON has no infrastructure designed for agents:
 
-The TRON energy market is fragmented. Each provider has different prices (22-80 SUN
-per unit), different APIs, different durations (5 minutes to 30 days). Prices change
-every 30 seconds. No single tool aggregates them all, compares prices in real time,
-and routes orders to the cheapest source.
+- **No agent-native payment service.** Existing TRON wallets are built for
+  human users with mouse clicks and seed-phrase backups, not for autonomous
+  programs that need to register addresses, send TRC-20s, watch for incoming
+  payments, and create invoices via REST.
 
-MERX solves this by aggregating all connected providers behind one API.
+- **Energy and bandwidth are a UX dead-end.** Every smart contract call on TRON
+  requires energy. Without energy, TRX tokens burn as fees -- a single USDT
+  transfer burns 3-13 TRX (~$1-4) for cold receivers. Renting energy from a
+  provider drops the cost to ~$0.10 -- a **94% reduction** -- but every
+  provider has a different price, different API, different duration tiers, and
+  different failure modes. No agent can be expected to manage that.
+
+- **No x402 facilitator on TRON before MERX.** The x402 protocol has already
+  processed $43.57M in agent-to-agent payments on Base, Solana, Stellar, and
+  Ethereum. TRON was completely absent from the coinbase/x402 ecosystem
+  registry until MERX. Agents that wanted to pay for TRON-hosted APIs in
+  USDT had no standardized way to do it.
+
+- **Three agent protocols, zero TRON integrations.** MCP (Anthropic), A2A
+  (Google), and ACP (BeeAI) are the three major agent communication protocols.
+  Until MERX, none of them had a deployed, production-grade TRON server.
+  AI agents in Claude, Vertex AI, or BeeAI literally could not see TRON.
+
+MERX builds the missing layer. AI agents call one API, hold zero TRX, and
+get paid / pay / send / receive in USDT, USDC, or USDD on the world's
+largest USDT network.
 
 | Without MERX | With MERX |
 |---|---|
-| Check every provider website for prices | One API call returns all prices sorted |
-| Compare across duration tiers manually | Automatic routing to cheapest source |
-| Create accounts on each provider | One MERX account covers all providers |
-| Fund each provider separately | One balance, one deposit address |
-| Handle each provider's unique API | Unified API, unified SDKs |
-| No fallback if a provider fails | Automatic failover to next cheapest |
-| No bandwidth optimization | Energy and bandwidth handled together |
-| Build and sign transactions manually | Resource-aware TX execution included |
+| Agent has to manage energy + bandwidth manually | `send()` estimates and provisions resources automatically |
+| Agent has to hold TRX as gas | GasFree transfers — agents send stablecoins from zero-TRX wallets |
+| Agent has to integrate every energy provider's API | One MERX API routes to the cheapest of 6 providers |
+| No way to pay for TRON-hosted APIs in USDT | x402 v2 facilitator with full USDT/USDC/USDD support |
+| No A2A/ACP discovery on TRON | Agent Card + Manifest live, 7 skills, 7 capabilities |
+| Agent has to write its own MCP server for TRON | 64 tools, 30 prompts, 21 resources, hosted |
+| Address watching means polling RPC | `watch()` with sub-3-second webhook delivery via ZMQ |
 
 ---
 
@@ -105,28 +140,37 @@ MERX solves this by aggregating all connected providers behind one API.
 
 | Component | Description |
 |---|---|
-| Web exchange | Trade energy and bandwidth at [merx.exchange](https://merx.exchange). Dashboard with real-time prices, order management, balance, and history. |
-| REST API | 46 endpoints covering prices, orders, balance, deposits, withdrawals, webhooks, and API keys. Versioned at `/api/v1/`. |
-| WebSocket | Real-time price stream at `wss://merx.exchange/ws`. Subscribe to specific providers or all. Heartbeat every 30 seconds. |
-| Webhooks | Events: `order.filled`, `order.failed`, `deposit.received`, `withdrawal.completed`. HMAC-SHA256 signed. Auto-retry on failure. |
-| JavaScript SDK | `merx-sdk` -- 4 modules (`prices`, `orders`, `balance`, `webhooks`), 16 methods. TypeScript types included. Zero dependencies. |
-| Python SDK | `merx-sdk` -- same 4 modules in snake_case. Zero dependencies. Python 3.11+. |
-| MCP server | 55 tools, 30 prompts, 21 resources for AI agents. Hosted SSE (zero install) or local stdio. |
-| Documentation | 36 pages at [merx.exchange/docs](https://merx.exchange/docs). API reference, guides, examples. |
-| Price widget | Embeddable widget for external sites showing live energy and bandwidth prices. |
+| MCP server | **64 tools, 30 prompts, 21 resources** for AI agents. Hosted SSE at `https://merx.exchange/mcp/sse` (zero install) or local stdio. SEP-1649 server card. The largest TRON-native MCP server in production. |
+| Claude Code plugin | One-line install: `/plugin marketplace add Hovsteder/merx-claude-plugin`. Auto-registers MCP, 6 slash commands, sub-agent. |
+| Agent Payment Service | `agent.merx.exchange` -- non-custodial REST API. `register`, `send`, `receive`, `watch`, `invoice`, `batch`, `schedule`, `contacts`. USDT live; USDD/USDC next sprint. |
+| x402 v2 Facilitator | `x402.merx.exchange` -- only TRON facilitator in the coinbase/x402 ecosystem registry. Three settlement schemes (`exact`, `exact_permit`, `exact_gasfree`) for USDT, USDC, USDD on TRON mainnet plus USDC on Base. |
+| GasFree Transfer Service | Mainnet controller `TKjJ1r5XYqnLZmLakcP3knis7Lh6gm3qtR` activated 2026-04-08. TIP-712 PermitTransfer for USDT/USDC/USDD. Agents send stablecoins from zero-TRX wallets. |
+| A2A Protocol (Google) | Agent Card at `/.well-known/agent.json`. **7 skills** including `compile_policy`. Task-based execution with SSE streaming. Compatible with LangChain, CrewAI, Vertex AI, AutoGen, Mastra. |
+| ACP Protocol (BeeAI) | Manifest at `/.well-known/agent-manifest.json`. **7 capabilities** matching A2A skills. Run-based execution with long-polling. |
+| Policy Engine | Natural language → standing orders, powered by Anthropic Claude Sonnet 4. Available as MCP tool, A2A skill, and REST endpoint. |
+| Energy aggregator | Real-time price comparison across **6 active providers** (CatFee, Netts, TronSave, iTRX, PowerSun, TEM). Routes orders to cheapest source. Underneath the agent surfaces. |
+| Dedicated TRON RPC node | `rpc.merx.exchange`, sub-5ms read latency, 13.7ms broadcast. Trial 1,000 free requests; paid tiers with energy-spend waiver. |
+| REST API | 70+ versioned endpoints under `/api/v1/`. Idempotency-Key on POST. Standard error format. |
+| WebSocket | Real-time TRC-20 transfer stream and price updates at `wss://merx.exchange/ws`. |
+| JavaScript SDK | `merx-sdk` v2.1 -- AgentModule + SwapModule + 4 base modules. TypeScript types included. |
+| Python SDK | `merx-sdk` v2.1 -- same surface in snake_case. |
+| x402 middleware | `merx-x402` v2.0.0 -- one-line Express integration for x402 v2. |
+| Documentation | 38+ pages at [merx.exchange/docs](https://merx.exchange/docs). API reference, MCP/A2A/ACP guides, x402 integration. |
 
 ---
 
 ## Quick start
 
-Three paths depending on your use case.
+Four paths depending on your use case. **For AI agents, paths 3 and 4 are the
+primary surfaces.** Path 1 (web) is for human operators; path 2 (REST/SDK) is
+for direct programmatic integration.
 
-### Path 1: Web platform
+### Path 1: Web platform (humans)
 
-Go to [merx.exchange](https://merx.exchange). Sign in. Deposit TRX. Trade energy
-and bandwidth at the best available price. No code required.
+Go to [merx.exchange](https://merx.exchange). Sign in. Deposit TRX. Manage
+energy, agent API keys, and balance through the dashboard. No code required.
 
-### Path 2: API / SDK
+### Path 2: REST API / SDK (programmatic)
 
 Install the JavaScript SDK:
 
@@ -191,10 +235,34 @@ curl -X POST https://merx.exchange/api/v1/orders \
   }'
 ```
 
-### Path 3: MCP for AI agents
+### Path 3: Claude Code plugin (one-line install)
 
-**Hosted (zero install)** -- works with Claude.ai, Cursor, and any SSE-compatible
-MCP client:
+If you're using Claude Code, this is the fastest path. The plugin auto-registers
+the hosted MCP server, ships 6 slash commands, and includes a
+`tron-agent-engineer` sub-agent specialized in agentic payment workflows on TRON.
+
+```
+/plugin marketplace add Hovsteder/merx-claude-plugin
+/plugin install merx@merx
+```
+
+Then run `/merx:setup` to configure your MERX API key. Available commands:
+
+| Command | What it does |
+|---|---|
+| `/merx:setup` | First-time setup: API key, connection test, capability tour |
+| `/merx:prices` | Live TRON energy and bandwidth prices across all providers |
+| `/merx:buy-energy` | Buy energy via cheapest provider, delegated to a target address |
+| `/merx:balance` | MERX prepaid balance, recent orders, free-tier usage |
+| `/merx:tx` | Look up a TRON transaction with structured fields |
+| `/merx:send` | Send TRC-20 stablecoin via the agent payment service |
+
+Source: [github.com/Hovsteder/merx-claude-plugin](https://github.com/Hovsteder/merx-claude-plugin).
+
+### Path 4: MCP for any AI agent (Claude, Cursor, Windsurf, custom)
+
+**Hosted (zero install)** -- works with Claude.ai, Cursor, Windsurf, and any
+SSE-compatible MCP client:
 
 ```json
 {
@@ -220,7 +288,7 @@ To unlock write tools (send TRX, swap tokens), call `set_private_key`:
 
 ```
 set_private_key("your_64_char_hex_key")
--> Address derived automatically. All 55 tools available.
+-> Address derived automatically. All 64 tools available.
 -> Key never leaves your machine.
 ```
 
@@ -244,14 +312,17 @@ npm install -g merx
 }
 ```
 
-All 55 tools available from the first message.
+All 64 tools available from the first message.
 
-## Additional Protocol Support
+### Additional protocol support
 
-MERX also supports A2A and ACP for non-MCP orchestrators:
+MERX also exposes A2A and ACP for non-MCP orchestrators -- same backend, different
+discovery surface:
 
-- **A2A** (LangChain, CrewAI, Vertex AI, AutoGen): `https://merx.exchange/.well-known/agent.json`
-- **ACP** (BeeAI): `https://merx.exchange/.well-known/agent-manifest.json`
+- **A2A** (LangChain, CrewAI, Vertex AI, AutoGen, Mastra): Agent Card at
+  [https://merx.exchange/.well-known/agent.json](https://merx.exchange/.well-known/agent.json) -- 7 skills, SSE streaming
+- **ACP** (BeeAI): Manifest at
+  [https://merx.exchange/.well-known/agent-manifest.json](https://merx.exchange/.well-known/agent-manifest.json) -- 7 capabilities, run-based execution
 
 ### Access levels
 
@@ -259,64 +330,99 @@ MERX also supports A2A and ACP for non-MCP orchestrators:
 |---|---|---|
 | No keys | 22 | Prices, estimation, market analysis, on-chain queries, address lookups |
 | + `MERX_API_KEY` | 34 | + Orders, balance, deposits, standing orders, monitors |
-| + `TRON_PRIVATE_KEY` | 55 | + Send TRX/USDT, swap tokens, approve contracts, execute intents |
+| + `TRON_PRIVATE_KEY` | 64 | + Send TRX/USDT/USDC/USDD, swap tokens, approve contracts, execute intents, agent payments |
 
 ---
 
 ## What sets MERX apart
 
-### Multi-provider routing
+### The only complete agent stack on TRON
 
-All connected energy and bandwidth providers are aggregated. Orders are routed to
-the cheapest source automatically. If one provider fails or runs out of capacity,
-the next cheapest fills the order. Prices cover both energy and bandwidth across
-every available duration tier.
+MERX is the only TRON project that runs **all three major agent protocols** as
+production-grade services: MCP (Anthropic), A2A (Google, 7 skills), and ACP
+(BeeAI, 7 capabilities). TronLink published a core MCP library
+(`@tronlink/tronlink-mcp-core` v0.1.0, March 2026) but it is explicitly a
+building block, not a hosted service. MERX is the only TRON entry in the
+[coinbase/x402 ecosystem partner registry](https://github.com/coinbase/x402/tree/main/partners-data).
+
+### Agent payment service with sub-3-second receive
+
+`agent.merx.exchange` is non-custodial: agents register their own TRON address
+and MERX never holds private keys or controls funds. The ZMQ event listener
+matches incoming TRC-20 transfers (USDT, USDC, USDD, plus any other token in
+real time) and dispatches webhooks within ~3 seconds of on-chain confirmation.
+`watch()` provides persistent 24/7 address monitoring with per-token filtering.
+`invoice()` creates payment requests with payment links and automatic
+detection. `batch()` sends up to 50 transfers in one call.
+
+### x402 v2 facilitator with full TRON stablecoin coverage
+
+`x402.merx.exchange` implements the standard `/verify`, `/settle`, and
+`/supported` endpoints, so any x402 client (including the Coinbase CDP
+reference implementation) interoperates out of the box. **Three settlement
+schemes live on TRON mainnet**: `exact` (direct TRC-20 transfer),
+`exact_permit` and `exact_gasfree` (TIP-712 PermitTransfer through MERX's own
+GasFreeController contract). USDT, USDC, and USDD all settled on mainnet
+with verified txids and on-chain commission collection. Among 15 known x402
+facilitators, MERX is the only one supporting the full TRON stablecoin set.
+
+### GasFree zero-TRX sends
+
+The MERX-deployed GasFreeController contract `TKjJ1r5XYqnLZmLakcP3knis7Lh6gm3qtR`
+went live on mainnet 2026-04-08 with three verified mainnet `permitTransfer`
+settlements (USDT, USDC, USDD). Agents send stablecoins from wallets that
+hold zero TRX -- the controller pulls value+fee from a per-user GasFree
+subaccount and the executor pays the broadcast gas. Single biggest UX barrier
+for agents on TRON, removed.
 
 ### Resource-aware transactions
 
-Every write operation (USDT transfer, token swap, contract call) automatically
-estimates energy AND bandwidth needed, buys the deficit at the best market price,
-waits for delegation to arrive on-chain, then executes. The caller never burns TRX
-unnecessarily. Tested on mainnet: a USDT transfer with auto-resources saves up to
-94% compared to burning.
+Every write operation (TRC-20 transfer, token swap, contract call) automatically
+estimates energy AND bandwidth needed, buys the deficit at the best market
+price across 6 providers, waits for delegation to arrive on-chain, then
+executes. The agent never burns TRX unnecessarily. Tested on mainnet:
+a USDT transfer with auto-resources saves up to 94% compared to burning.
 
 ### Exact energy simulation
 
 Before buying energy for swaps and contract calls, MERX simulates the exact
 transaction via `triggerConstantContract` with real parameters. No hardcoded
-estimates -- the precise energy amount is purchased. For a SunSwap swap, simulation
-returned 223,354 energy; the on-chain transaction used exactly 223,354.
+estimates -- the precise energy amount is purchased. For a SunSwap V2 swap,
+simulation returned 223,354 energy; the on-chain transaction used exactly
+223,354.
 
-### Intent execution
+### Natural language Policy Engine
 
-Describe a multi-step plan (transfer + swap + another transfer). MERX simulates all
-steps, estimates total resource cost, and executes sequentially. Stateful simulation:
-energy consumed by step 1 is not available for step 2. Accurate total cost estimates
-for complex workflows.
+> "Keep 500,000 energy on my wallet. Buy when price drops below 55 SUN.
+> Max 200 TRX per week."
 
-### Standing orders
+The Policy Engine (powered by Anthropic Claude Sonnet 4) parses this
+instruction, generates structured standing orders with triggers, budget
+limits, and expiration, previews them for the user, and creates everything
+with one confirmation. Available through MCP, A2A skill, and REST endpoint.
+No competitor can replicate this without their own Anthropic integration,
+standing order infrastructure, and real-time provider price feeds.
 
-Server-side 24/7 automation stored in PostgreSQL. Example: "Buy 65,000 energy when
-price drops below 20 SUN." Trigger types: `price_below`, `price_above`, `schedule`
-(cron), `balance_below`. Persists across restarts. Works when the client is offline.
+### Multi-provider energy routing (under the agent surfaces)
 
-### Delegation monitors
+All 6 active energy providers are aggregated (CatFee, Netts, TronSave, iTRX,
+PowerSun, TEM). Orders are routed to the cheapest source automatically. If
+one provider fails or runs out of capacity, the next cheapest fills the order.
+Prices cover both energy and bandwidth across every available duration tier.
 
-Watch energy and bandwidth delegations on any address. Alert before expiry.
-Auto-renew with configurable max price. Monitor types: `delegation_expiry`,
-`balance_threshold`, `price_alert`.
+### Standing orders + delegation monitors
 
-### x402 pay-per-use
-
-No account needed. No pre-deposit. Create an invoice, pay with TRX from any wallet,
-and receive energy delegation. Complete flow in one API call. Tested on mainnet:
-1.43 TRX payment resulted in 65,050 energy delegated.
+Server-side 24/7 automation stored in PostgreSQL. Trigger types: `price_below`,
+`price_above`, `schedule` (cron), `balance_below`, `delegation_expiry`.
+Persists across restarts. Works when the client is offline. Auto-renew with
+configurable max price.
 
 ### Full MCP protocol
 
-The only TRON MCP server using all three MCP primitives: tools (55), prompts (30),
-and resources (21 -- 14 static + 7 templates). Two transport modes: hosted SSE
-(zero install) and local stdio (full key management).
+The only TRON MCP server using all three MCP primitives: **tools (64), prompts
+(30), and resources (21 -- 14 static + 7 templates)**. Two transport modes:
+hosted SSE (zero install) and local stdio (full key management). Three
+protocol versions supported: `2024-11-05`, `2025-03-26`, `2025-06-18`.
 
 ---
 
@@ -537,8 +643,13 @@ Full API reference: [merx.exchange/docs/api](https://merx.exchange/docs/api)
 
 ## MCP server
 
-MERX provides a full MCP (Model Context Protocol) server for AI agents. 55 tools
-across 15 categories, 30 pre-built prompts, and 21 live data resources.
+MERX provides a full MCP (Model Context Protocol) server for AI agents. 64 tools
+across 18 categories, 30 pre-built prompts, and 21 live data resources.
+
+> **Note:** the tool catalog table below was last fully audited at 52 tools.
+> Twelve newer tools (agent payment service, swap module, advanced standing
+> orders) are documented at [merx.exchange/docs/tools/mcp-server](https://merx.exchange/docs/tools/mcp-server).
+> The canonical count is **64**, served by the live MCP server.
 
 ### Tool categories
 
@@ -647,7 +758,7 @@ Agent: [calls analyze_prices] Energy is at 22 SUN -- the 1st percentile
 
 ### Full tool reference
 
-All 55 tools with auth requirements. For input schemas and output examples, see
+All 64 tools with auth requirements. For input schemas and output examples, see
 [docs/TOOLS.md](docs/TOOLS.md).
 
 **Price Intelligence**
@@ -1180,7 +1291,7 @@ Factual comparison based on publicly available information.
 | MCP Tools | 55 | ~20 | ~10 | 27 | 27 |
 | MCP Prompts | 30 | 0 | 0 | 0 | 0 |
 | MCP Resources | 21 | 0 | 0 | 0 | 0 |
-| REST API | 46 endpoints | No | No | No | No |
+| REST API | 70+ endpoints | No | No | No | No |
 | JavaScript SDK | Yes | No | No | No | No |
 | Python SDK | Yes | No | No | No | No |
 | WebSocket | Yes | No | No | No | No |

@@ -2,8 +2,8 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "maintainers": ["Hovsteder"],
   "name": "merx-mcp",
-  "displayName": "MERX - TRON Resource Exchange",
-  "description": "The complete TRON infrastructure layer for AI agents. Supports MCP (55 tools), A2A (Google), and ACP (BeeAI). Aggregates all energy and bandwidth providers, routes orders to cheapest source. Resource-aware transactions, SunSwap DEX swaps, x402 pay-per-use, standing orders.",
+  "displayName": "MERX - TRON Infrastructure for AI Agents",
+  "description": "The complete TRON infrastructure layer for AI agents. 64 MCP tools across 18 categories: energy aggregation across 6 providers, TRC-20 stablecoin payments (USDT/USDC/USDD), agent payment service (send/receive/watch/invoice), x402 v2 facilitator (only TRON facilitator in coinbase/x402 ecosystem registry), GasFree transfers, SunSwap V2 DEX, standing orders, natural language Policy Engine, on-chain queries. Also exposes A2A (Google, 7 skills) and ACP (BeeAI, 7 capabilities) protocols.",
   "homepage": "https://merx.exchange",
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     }
   ],
   "categories": ["blockchain", "finance", "agent-orchestration"],
-  "tags": ["tron", "energy", "bandwidth", "usdt", "defi", "sunswap", "x402", "a2a", "acp", "multi-protocol"],
-  "tools": 55,
+  "tags": ["tron", "energy", "bandwidth", "usdt", "usdc", "usdd", "stablecoin", "defi", "sunswap", "x402", "gasfree", "agent-payments", "a2a", "acp", "multi-protocol"],
+  "tools": 64,
   "prompts": 30,
   "resources": 21,
   "author": {
